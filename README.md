@@ -11,7 +11,12 @@ $ ./sbt
 
 If `browse` doesn't launch your browser, manually open [http://localhost:8080/](http://localhost:8080/) in your browser.
 
-##This application requires mysql/mariadb and the following primes database :##
+##Requires a datasource named "primesdb"##
+With tomcat
+```
+```
+
+##Requires the following primes database (mysql or mariadb)##
 ```sql
 mysql -uroot
 
