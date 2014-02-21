@@ -12,11 +12,13 @@ $ ./sbt
 If `browse` doesn't launch your browser, manually open [http://localhost:8080/](http://localhost:8080/) in your browser.
 
 ##Requires a datasource named "primesdb"##
-With tomcat
-```
+With tomcat :
 ```
 
-##Requires the following primes database (mysql or mariadb)##
+```
+
+##Requires the following primes database##
+Using mysql or mariadb :
 ```sql
 mysql -uroot
 

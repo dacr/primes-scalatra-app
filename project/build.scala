@@ -21,13 +21,17 @@ object PrimesscalatraappBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers += Classpaths.typesafeReleases,
+      resolvers += "sonatype repository" at "https://oss.sonatype.org/content/repositories/releases/",
       libraryDependencies ++= Seq(
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "fr.janalyse" %% "primes" % "1.0.9",
-        "com.typesafe.play" %% "anorm" % "2.2.1",
+        //"com.typesafe.play" %% "anorm" % "2.2.1",
+        "org.squeryl" %% "squeryl" % "0.9.5-6",
+        "com.mchange" % "c3p0" % "0.9.5-pre6",
         "net.sf.ehcache" % "ehcache-core" % "2.6.8",
+        "mysql" % "mysql-connector-java" % "5.1.28" % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.6" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))
