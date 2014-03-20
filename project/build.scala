@@ -7,7 +7,7 @@ import ScalateKeys._
 
 object PrimesscalatraappBuild extends Build {
   val Organization = "fr.janalyse"
-  val Name = "primes-scalatra-app"
+  val Name = "primesui"
   val Version = "0.1.0"
   val ScalaVersion = "2.10.3"
   val ScalatraVersion = "2.2.2"
