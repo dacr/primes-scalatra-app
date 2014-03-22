@@ -8,9 +8,10 @@ FLUSH PRIVILEGES;
 USE PRIMES;
 
 CREATE TABLE CachedPrime(
-  value      BIGINT NOT NULL PRIMARY KEY,
+  value      BIGINT  NOT NULL PRIMARY KEY,
   isPrime    BOOLEAN NOT NULL,
-  digitCount BIGINT NOT NULL,
-  nth        BIGINT NOT NULL
+  digitCount BIGINT  NOT NULL,
+  nth        BIGINT  NOT NULL
 );
 
+CREATE INDEX cachedPrimeIDX ON CachedPrime(isPrime, nth);
