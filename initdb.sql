@@ -8,9 +8,9 @@ FLUSH PRIVILEGES;
 USE PRIMES;
 
 CREATE TABLE CachedPrime(
-  value      BIGINT,
-  isPrime    BOOLEAN,
-  digitCount BIGINT,
-  nth        BIGINT
+  value      BIGINT NOT NULL PRIMARY KEY,
+  isPrime    BOOLEAN NOT NULL,
+  digitCount BIGINT NOT NULL,
+  nth        BIGINT NOT NULL
 );
 
