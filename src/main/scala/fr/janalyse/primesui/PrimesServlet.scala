@@ -9,6 +9,7 @@ import org.squeryl.SessionFactory
 import org.squeryl.Session
 import org.squeryl.adapters.MySQLAdapter
 
+/*
 sealed trait DataSourceProvider {
   def dataSource: DataSource
   
@@ -30,7 +31,7 @@ trait TestDataSourceProvider extends DataSourceProvider {
 trait JndiDataSourceProvider extends DataSourceProvider {
   lazy val dataSource = new InitialContext().lookup("java:comp/env/jdbc/primes").asInstanceOf[DataSource]
 }
-
+*/
 
 class PrimesServlet extends PrimesscalatraappStack {
 
