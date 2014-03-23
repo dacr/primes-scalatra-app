@@ -22,6 +22,7 @@ object PrimesscalatraappBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers += Classpaths.typesafeReleases,
       resolvers += "sonatype repository" at "https://oss.sonatype.org/content/repositories/releases/",
+      resolvers += "JAnalyse Repository" at "http://www.janalyse.fr/repository/",
       libraryDependencies ++= Seq(
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,

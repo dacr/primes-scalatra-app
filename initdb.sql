@@ -5,7 +5,7 @@ CREATE DATABASE primes;
 GRANT ALL PRIVILEGES ON primes.* TO 'optimus'@'localhost' identified by 'bumblebee' ;
 FLUSH PRIVILEGES;
 
-USE PRIMES;
+USE primes;
 
 CREATE TABLE CachedPrime(
   value      BIGINT  NOT NULL PRIMARY KEY,
@@ -15,3 +15,9 @@ CREATE TABLE CachedPrime(
 );
 
 CREATE INDEX cachedPrimeIDX ON CachedPrime(isPrime, nth);
+
+
+# TO connect from command line :
+# mysql -h localhost -u optimus -p primes
+#
+#
