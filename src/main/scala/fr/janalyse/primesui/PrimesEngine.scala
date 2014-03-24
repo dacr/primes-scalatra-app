@@ -6,7 +6,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 
-object PrimesEngine {
+object PrimesEngine extends PrimesDBApi {
   private val pgen = new PrimesGenerator[Long]
   
   private val values = pgen.checkedValues
@@ -38,22 +38,26 @@ object PrimesEngine {
     } else concurrent.future {'StillInProgress}
   }
   
+  def conv(cv:CachedValue):CheckedValue[Long] = {
+    new CheckedValue[Long](cv.value, cv.isPrime, cv.digitCount, cv.nth)
+  }
   
   
-  def valuesCount() = -1
+  def valuesCount():Long = dbValuesCount()
   
-  def primesCount() = -1
+  def primesCount():Long = dbPrimesCount()
   
-  def notPrimesCount() = -1
+  def notPrimesCount():Long = dbNotPrimesCount()
   
-  def lastPrime():Option[CheckedValue[Long]] = None
+  def lastPrime():Option[CheckedValue[Long]] = dbLastPrime.map(conv)
   
-  def lastNotPrime():Option[CheckedValue[Long]] = None
+  def lastNotPrime():Option[CheckedValue[Long]] = dbLastNotPrime.map(conv)
   
-  def check(num:Long) = values.find(_.value == num)
+  def check(num:Long):Option[CheckedValue[Long]] = dbCheck(num).map(conv)
 
-  def getPrime(nth:Long) = pgen.checkedValues.filter(_.isPrime).find(_.nth == nth)
+  def getPrime(nth:Long):Option[CheckedValue[Long]] = dbGetPrime(nth).map(conv)
   
-  def factorize(num:Long) = pgen.factorize(num, pgen.primes.iterator)
+  // TODO TO FINISH
+  def factorize(num:Long):Option[List[Long]] = pgen.factorize(num, pgen.primes.iterator)
   
 }

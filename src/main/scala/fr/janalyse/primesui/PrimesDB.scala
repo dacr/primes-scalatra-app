@@ -29,12 +29,49 @@ object PrimesDB extends Schema {
 trait PrimesDBApi {
   import PrimesDB._
 
-  def getPrime(value: Long): Option[CachedValue] =
-    cachedValues.find(s => s.value == value)
-
-  def addCheckedValue(cachedValue:CachedValue) = {
+  def dbAddValue(cachedValue:CachedValue) = {
     cachedValues.insert(cachedValue)
   }
+  
+  def dbValuesCount() = cachedValues.Count.single
+  
+  def dbPrimesCount() = 
+    from(cachedValues) ( s =>
+      where(s.isPrime===true)
+      compute(count)
+      ).single.measures
+  
+  def dbNotPrimesCount() = 
+    from(cachedValues) ( s =>
+      where(s.isPrime===false)
+      compute(count)
+      ).single.measures
+  
+  def dbLastPrime():Option[CachedValue] = 
+    from(cachedValues) (cv=>
+      where(cv.isPrime===true)
+      select(cv)
+      orderBy(cv.value desc)
+      ).headOption
+  
+  def dbLastNotPrime():Option[CachedValue] = 
+    from(cachedValues) (cv=>
+      where(cv.isPrime===false)
+      select(cv)
+      orderBy(cv.value desc)
+      ).headOption
+  
+  def dbCheck(value: Long): Option[CachedValue] =
+    from(cachedValues) (cv =>
+      where(cv.value === value)
+      select(cv)
+      ).headOption
+
+  def dbGetPrime(nth:Long): Option[CachedValue] =
+    from(cachedValues) (cv =>
+      where(cv.nth === nth and cv.isPrime === true)
+      select(cv)
+      ).headOption
 }
 
 

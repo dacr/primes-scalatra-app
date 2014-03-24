@@ -7,14 +7,14 @@ FLUSH PRIVILEGES;
 
 USE primes;
 
-CREATE TABLE CachedValues(
+CREATE TABLE CachedValue(
   value      BIGINT  NOT NULL PRIMARY KEY,
   isPrime    BOOLEAN NOT NULL,
   digitCount BIGINT  NOT NULL,
   nth        BIGINT  NOT NULL
 );
 
-CREATE INDEX cachedValuesIDX ON CachedValues(isPrime, nth);
+CREATE INDEX cachedValueIDX ON CachedValue(isPrime, nth);
 
 
 # TO connect from command line :

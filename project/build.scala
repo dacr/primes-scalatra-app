@@ -27,6 +27,7 @@ object PrimesscalatraappBuild extends Build {
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
+        "org.scalatra" %% "scalatra-scalatest" % "2.2.2" % "test",
         "fr.janalyse" %% "primes" % "1.0.9",
         //"com.typesafe.play" %% "anorm" % "2.2.1",
         "org.squeryl" %% "squeryl" % "0.9.5-6",
