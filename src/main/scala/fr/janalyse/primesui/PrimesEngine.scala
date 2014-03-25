@@ -40,8 +40,8 @@ object PrimesEngine extends PrimesDBApi {
     if (worker.isEmpty || worker.get.isCompleted) {
       val populateFuture = populatePrimesIfRequired(upTo)
       worker = Some(populateFuture)
-      concurrent.future {'JobStarted}
-    } else concurrent.future {'StillInProgress}
+      'Started
+    } else 'StillInProgress
   }
   
   def conv(nv:CheckedValue[Long]):CachedValue = {

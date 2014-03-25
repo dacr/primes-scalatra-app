@@ -119,9 +119,10 @@ class PrimesServlet extends PrimesscalatraappStack {
   
   get("/populate/:upto") {
     val upto = params("upto").toLong
+    populate(upto)
     <html>
       <body>
-        <h1>{ populate(upto) }</h1>
+        <h1>Primes generator : {populate(upto)}</h1>
       </body>
     </html>
   }
