@@ -37,10 +37,10 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   import PrimesEngine._
 
-  get("/") { try {
+  get("/") {
     <html>
       <body>
-        <h1>Prime web application is ready.</h1>
+        <h1>Primes web application is ready.</h1>
         The database cache contains <b>{ valuesCount }</b>
         already checked values, with <b>{ primesCount }</b>
         primes found.
@@ -62,9 +62,6 @@ class PrimesServlet extends PrimesscalatraappStack {
         </ul>
       </body>
     </html>
-  } catch {
-    case e:Exception => e.printStackTrace ; throw e     
-  }
   }
 
   get("/check/:num") {

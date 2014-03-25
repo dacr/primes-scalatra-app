@@ -36,6 +36,7 @@ object PrimesEngine extends PrimesDBApi {
   }
 
   var worker:Option[Future[Symbol]]=None
+  
   def populate(upTo:Long) = this.synchronized {
     if (worker.isEmpty || worker.get.isCompleted) {
       val populateFuture = populatePrimesIfRequired(upTo)
