@@ -4,27 +4,37 @@ import fr.janalyse.primes._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 import scala.concurrent.duration._
-
 import org.squeryl.PrimitiveTypeMode._
+import net.sf.ehcache.CacheManager
+import java.lang.management.ManagementFactory
+import net.sf.ehcache.management.ManagementService
+import net.sf.ehcache.Element
+
+trait PrimesCacheInit {
+  def cacheSetup() {
+    CacheManager.create()
+    val manager = CacheManager.newInstance();
+    val mBeanServer = ManagementFactory.getPlatformMBeanServer();
+    ManagementService.registerMBeans(manager, mBeanServer, true, true, true, true);
+  }
+  
+  def cacheTeardown() {
+    CacheManager.getInstance().shutdown()
+  }
+}
 
 
 object PrimesEngine extends PrimesDBApi {
-  private val pgen = new PrimesGenerator[Long]
   
-  private val values = pgen.checkedValues
-
+  private lazy val cache = CacheManager.getInstance()
+  private lazy val cachedValueCache = cache.getCache("CachedValue")
   
   private def populatePrimesIfRequired(upTo: Long = 100000) = {
-    //val values = db("values")
-
+    val pgen = new PrimesGenerator[Long]
     val fall = future {
       var resumedStream = pgen.checkedValues(lastPrime, lastNotPrime)
       while (resumedStream.head.value <= upTo) {
-        //values.insert(resumedStream.head)
-        transaction {
-          val nv = resumedStream.head
-          dbAddValue(conv(nv))
-        }
+        transaction { dbAddValue(conv(resumedStream.head)) }
         resumedStream = resumedStream.tail
       }
       'done
@@ -34,6 +44,14 @@ object PrimesEngine extends PrimesDBApi {
     }
     fall
   }
+
+  def conv(nv:CheckedValue[Long]):CachedValue = {
+    new CachedValue(nv.value, nv.isPrime, nv.digitCount, nv.nth)
+  }
+  def conv(cv:CachedValue):CheckedValue[Long] = {
+    new CheckedValue[Long](cv.value, cv.isPrime, cv.digitCount, cv.nth)
+  }
+  
 
   var worker:Option[Future[Symbol]]=None
   
@@ -45,14 +63,6 @@ object PrimesEngine extends PrimesDBApi {
     } else 'StillInProgress
   }
   
-  def conv(nv:CheckedValue[Long]):CachedValue = {
-    new CachedValue(nv.value, nv.isPrime, nv.digitCount, nv.nth)
-  }
-  def conv(cv:CachedValue):CheckedValue[Long] = {
-    new CheckedValue[Long](cv.value, cv.isPrime, cv.digitCount, cv.nth)
-  }
-  
-  
   def valuesCount():Long = transaction { dbValuesCount()}
   
   def primesCount():Long = transaction {dbPrimesCount() }
@@ -63,11 +73,21 @@ object PrimesEngine extends PrimesDBApi {
   
   def lastNotPrime():Option[CheckedValue[Long]] = transaction {dbLastNotPrime.map(conv)}
   
-  def check(num:Long):Option[CheckedValue[Long]] = transaction {dbCheck(num).map(conv)}
+  //def check(num:Long):Option[CheckedValue[Long]] = transaction {dbCheck(num).map(conv)}
+  
+  def check(num:Long):Option[CheckedValue[Long]] = {
+    val item = cachedValueCache.get(num)
+    if (item==null) {
+         val cv = transaction {dbCheck(num).map(conv)}
+         cachedValueCache.put(new Element(num, cv))
+         cv
+    } else item.getObjectValue().asInstanceOf[Option[CheckedValue[Long]]]
+  }
 
   def getPrime(nth:Long):Option[CheckedValue[Long]] = transaction {dbGetPrime(nth).map(conv)}
   
   // TODO TO FINISH
+  val pgen = new PrimesGenerator[Long]
   def factorize(num:Long):Option[List[Long]] = pgen.factorize(num, pgen.primes.iterator)
   
 }

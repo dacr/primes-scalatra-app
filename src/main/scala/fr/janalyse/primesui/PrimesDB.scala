@@ -9,6 +9,7 @@ import org.squeryl.Session
 import org.squeryl.SessionFactory
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.squeryl.adapters.MySQLAdapter
+import fr.janalyse.primes.CheckedValue
 
 class CachedValue(
   val value: Long,
@@ -16,6 +17,7 @@ class CachedValue(
   val digitCount: Long,
   val nth: Long)
 
+  
 object PrimesDB extends Schema {
   val cachedValues = table[CachedValue]
 
