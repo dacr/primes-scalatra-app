@@ -41,17 +41,18 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>Prime web application is ready.</h1>
-        The database cache contains{ valuesCount }
-        already checked values, with{ primesCount }
+        The database cache contains <b>{ valuesCount }</b>
+        already checked values, with <b>{ primesCount }</b>
         primes found.
-        The highest found prime is{ lastPrime.map(_.value).getOrElse(-1) }
+        The highest found prime is <b>{ lastPrime.map(_.value).getOrElse(-1) }</b>
         <h2>The API</h2>
         <ul>
           <li><b>check/</b><i>$num</i> : to test if <i>$num</i> is a prime number or not</li>
           <li><b>slowcheck/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds at server side, this is for test purposes</li>
           <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
           <li><b>factors/</b><i>$num</i> : to get the primer factors of <i>$num</i></li>
-<!--          <li><b>primes/</b><i>$to</i> : list primes up to <i>$to</i></li>
+<!--
+          <li><b>primes/</b><i>$to</i> : list primes up to <i>$to</i></li>
           <li><b>primes/</b><i>$form</i>/<i>$to</i> : list primes from <i>$from</i> to <i>$to</i></li>
 -->
           <li><b>populate/</b><i>$upTo</i> : populate the database up to the specified value. Take care it calls a synchronized method.</li>
@@ -118,8 +119,6 @@ class PrimesServlet extends PrimesscalatraappStack {
   
   get("/populate/:upto") {
     val upto = params("upto").toLong
-    val checked = getPrime(upto).get // TODO : DANGEROUS
-    import checked._
     <html>
       <body>
         <h1>{ populate(upto) }</h1>
