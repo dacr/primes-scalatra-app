@@ -38,7 +38,7 @@ class PrimesDBTest extends FunSuite with ShouldMatchers with BeforeAndAfterAll w
     transaction {
       val p  = api.dbCheck(997)
       p.map(_.isPrime).get should be (true)
-      val np = api.dbCheck(1001)
+      val np = api.dbCheck(1000)
       np.map(_.isPrime).get should be (false)
     }
   }
