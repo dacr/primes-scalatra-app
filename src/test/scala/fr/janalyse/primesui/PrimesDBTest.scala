@@ -32,7 +32,7 @@ class PrimesDBTest extends FunSuite with ShouldMatchers with BeforeAndAfterAll w
       api.dbLastNotPrime should be ('defined)
       api.dbLastPrime should be ('defined)
       api.dbLastPrime.map(_.value).get should be >=(997L)
-      api.dbLastNotPrime.map(_.value).get should be >=(1001L)
+      api.dbLastNotPrime.map(_.value).get should be >=(1000L)
     }
     
     transaction {
