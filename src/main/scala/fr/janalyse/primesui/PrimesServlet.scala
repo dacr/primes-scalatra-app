@@ -37,7 +37,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   import PrimesEngine._
 
-  get("/") {
+  get("/") { try {
     <html>
       <body>
         <h1>Prime web application is ready.</h1>
@@ -51,15 +51,19 @@ class PrimesServlet extends PrimesscalatraappStack {
           <li><b>slowcheck/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds at server side, this is for test purposes</li>
           <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
           <li><b>factors/</b><i>$num</i> : to get the primer factors of <i>$num</i></li>
-          <!--
-          <li><b>primes/</b><i>$to</i> : list primes up to <i>$to</i></li>
+<!--          <li><b>primes/</b><i>$to</i> : list primes up to <i>$to</i></li>
           <li><b>primes/</b><i>$form</i>/<i>$to</i> : list primes from <i>$from</i> to <i>$to</i></li>
+-->
           <li><b>populate/</b><i>$upTo</i> : populate the database up to the specified value. Take care it calls a synchronized method.</li>
+<!--
           <li><b>ulam/</b><i>$size</i> : Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation</li>
 -->
         </ul>
       </body>
     </html>
+  } catch {
+    case e:Exception => e.printStackTrace ; throw e     
+  }
   }
 
   get("/check/:num") {
@@ -111,4 +115,17 @@ class PrimesServlet extends PrimesscalatraappStack {
       </body>
     </html>
   }
+  
+  get("/populate/:upto") {
+    val upto = params("upto").toLong
+    val checked = getPrime(upto).get // TODO : DANGEROUS
+    import checked._
+    <html>
+      <body>
+        <h1>{ populate(upto) }</h1>
+      </body>
+    </html>
+  }
+
+  
 }

@@ -5,6 +5,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 import scala.concurrent.duration._
 
+import org.squeryl.PrimitiveTypeMode._
+
 
 object PrimesEngine extends PrimesDBApi {
   private val pgen = new PrimesGenerator[Long]
@@ -19,6 +21,10 @@ object PrimesEngine extends PrimesDBApi {
       var resumedStream = pgen.checkedValues(lastPrime, lastNotPrime)
       while (resumedStream.head.value <= upTo) {
         //values.insert(resumedStream.head)
+        transaction {
+          val nv = resumedStream.head
+          dbAddValue(conv(nv))
+        }
         resumedStream = resumedStream.tail
       }
       'done
@@ -38,24 +44,27 @@ object PrimesEngine extends PrimesDBApi {
     } else concurrent.future {'StillInProgress}
   }
   
+  def conv(nv:CheckedValue[Long]):CachedValue = {
+    new CachedValue(nv.value, nv.isPrime, nv.digitCount, nv.nth)
+  }
   def conv(cv:CachedValue):CheckedValue[Long] = {
     new CheckedValue[Long](cv.value, cv.isPrime, cv.digitCount, cv.nth)
   }
   
   
-  def valuesCount():Long = dbValuesCount()
+  def valuesCount():Long = transaction { dbValuesCount()}
   
-  def primesCount():Long = dbPrimesCount()
+  def primesCount():Long = transaction {dbPrimesCount() }
   
-  def notPrimesCount():Long = dbNotPrimesCount()
+  def notPrimesCount():Long = transaction {dbNotPrimesCount()}
   
-  def lastPrime():Option[CheckedValue[Long]] = dbLastPrime.map(conv)
+  def lastPrime():Option[CheckedValue[Long]] = transaction {dbLastPrime.map(conv)}
   
-  def lastNotPrime():Option[CheckedValue[Long]] = dbLastNotPrime.map(conv)
+  def lastNotPrime():Option[CheckedValue[Long]] = transaction {dbLastNotPrime.map(conv)}
   
-  def check(num:Long):Option[CheckedValue[Long]] = dbCheck(num).map(conv)
+  def check(num:Long):Option[CheckedValue[Long]] = transaction {dbCheck(num).map(conv)}
 
-  def getPrime(nth:Long):Option[CheckedValue[Long]] = dbGetPrime(nth).map(conv)
+  def getPrime(nth:Long):Option[CheckedValue[Long]] = transaction {dbGetPrime(nth).map(conv)}
   
   // TODO TO FINISH
   def factorize(num:Long):Option[List[Long]] = pgen.factorize(num, pgen.primes.iterator)

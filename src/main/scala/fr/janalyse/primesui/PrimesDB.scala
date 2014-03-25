@@ -89,8 +89,8 @@ trait PrimesDBInit {
     cpds.setUser(dbUsername)
     cpds.setPassword(dbPassword)
     
-    SessionFactory.concreteFactory = Some(() => connection)
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
+    SessionFactory.concreteFactory = Some(() => connection)
     cpdsopt = Some(cpds)
   }
 
