@@ -13,19 +13,27 @@ import scala.concurrent.duration._
 
 class PrimesDBTest extends FunSuite with ShouldMatchers with BeforeAndAfterAll with PrimesDBInit {
 
+  val engine = new PrimesEngine()
+
   override def beforeAll() {
     dbSetup()
+    engine.setup()
+    engine.setUseCache(false)
   }
 
   override def afterAll() {
     dbTeardown()
+    engine.teardown()
   }
+  
+  val upTo=1000L
 
   test("populate test") {
-    val upTo=1000L
-    PrimesEngine.populate(upTo)
-    Await.result(PrimesEngine.worker.get, 60.seconds)
-    
+    engine.populate(upTo)
+    Await.result(engine.worker.get, 60.seconds)
+  }
+  
+  test("db primes api tests") {
     val api = new PrimesDBApi {}
     transaction {
       api.dbValuesCount should be >=(upTo - 1)

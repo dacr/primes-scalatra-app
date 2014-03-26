@@ -8,43 +8,24 @@ import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.squeryl.SessionFactory
 import org.squeryl.Session
 import org.squeryl.adapters.MySQLAdapter
+import javax.servlet.ServletRequest
 
-/*
-sealed trait DataSourceProvider {
-  def dataSource: DataSource
-  
-  SessionFactory.concreteFactory = Some(() => connection)
-  def connection = Session.create(dataSource.getConnection, new MySQLAdapter)
-}
-
-trait TestDataSourceProvider extends DataSourceProvider {
-  lazy val dataSource: DataSource = {
-    var cpds = new ComboPooledDataSource
-    cpds.setDriverClass("com.mysql.jdbc.Driver")
-    cpds.setJdbcUrl("jdbc:mysql://localhost/primes")
-    cpds.setUser("tomcat")
-    cpds.setPassword("tomcat")
-    cpds
-  }
-  
-}
-trait JndiDataSourceProvider extends DataSourceProvider {
-  lazy val dataSource = new InitialContext().lookup("java:comp/env/jdbc/primes").asInstanceOf[DataSource]
-}
-*/
 
 class PrimesServlet extends PrimesscalatraappStack {
 
-  import PrimesEngine._
-
+  implicit class PrimesEngineRequest( request : ServletRequest ) {
+    def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
+  }
+  
   get("/") {
+    val engine = request.engine
     <html>
       <body>
         <h1>Primes web application is ready.</h1>
-        The database cache contains <b>{ valuesCount }</b>
-        already checked values, with <b>{ primesCount }</b>
+        The database cache contains <b>{ engine.valuesCount }</b>
+        already checked values, with <b>{ engine.primesCount }</b>
         primes found.
-        The highest found prime is <b>{ lastPrime.map(_.value).getOrElse(-1) }</b>
+        The highest found prime is <b>{ engine.lastPrime.map(_.value).getOrElse(-1) }</b>
         <h2>The API</h2>
         <ul>
           <li><b>check/</b><i>$num</i> : to test if <i>$num</i> is a prime number or not</li>
@@ -65,8 +46,9 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   get("/check/:num") {
+    val engine = request.engine
     val num = params("num").toLong
-    val value = check(num)
+    val value = engine.check(num)
     val isPrime = value.map(_.isPrime).getOrElse(false)
     <html>
       <body>
@@ -76,10 +58,11 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   get("/slowcheck/:num/:secs") {
+    val engine = request.engine
     val secs = params.get("secs").map(_.toLong).getOrElse(1L)
     Thread.sleep(secs * 1000L)
     val num = params("num").toLong
-    val value = check(num)
+    val value = engine.check(num)
     val isPrime = value.map(_.isPrime).getOrElse(false)
     <html>
       <body>
@@ -91,8 +74,9 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   get("/prime/:nth") {
+    val engine = request.engine
     val nth = params("nth").toLong
-    val checked = getPrime(nth).get // TODO : DANGEROUS
+    val checked = engine.getPrime(nth).get // TODO : DANGEROUS
     import checked._
     <html>
       <body>
@@ -102,8 +86,9 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   get("/factors/:num") {
+    val engine = request.engine
     val num = params("num").toLong
-    val factors = factorize(num).get // TODO : DANGEROUS 
+    val factors = engine.factorize(num).get // TODO : DANGEROUS 
     <html>
       <body>
         {
@@ -115,11 +100,11 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
   
   get("/populate/:upto") {
+    val engine = request.engine
     val upto = params("upto").toLong
-    populate(upto)
     <html>
       <body>
-        <h1>Primes generator : {populate(upto)}</h1>
+        <h1>Primes generator : {engine.populate(upto)}</h1>
       </body>
     </html>
   }

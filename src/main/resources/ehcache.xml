@@ -2,23 +2,55 @@
 <ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="ehcache.xsd"
           updateCheck="true" monitoring="autodetect"
-          dynamicConfig="true" name="swbCache">
+          dynamicConfig="true" name="primesCache">
 
 	<defaultCache 
 	    maxEntriesLocalHeap="10000"
 	    eternal="false"
-		timeToIdleSeconds="120"
-		timeToLiveSeconds="120"
+		timeToIdleSeconds="600"
+		timeToLiveSeconds="3600"
 		overflowToDisk="false"
 		statistics="true"
 		/>
 
+    <!-- checked value cache, indexed by the value -->
     <cache
-		name="CachedValue"
-        maxEntriesLocalHeap="500"
+		name="CachedValuesCache"
+        maxEntriesLocalHeap="10000"
 		timeToIdleSeconds="600"
 		timeToLiveSeconds="3600"
-		overflowToDisk="false"
+        />
+
+    <!-- prime values cache, indexed by the position -->
+    <cache
+        name="PrimesCache"
+        maxEntriesLocalHeap="10000"
+        timeToIdleSeconds="600"
+        timeToLiveSeconds="3600"
+        />
+
+    <!-- various counters temporary cache -->
+    <cache
+        name="CountersCache"
+        maxEntriesLocalHeap="10"
+        timeToIdleSeconds="10"
+        timeToLiveSeconds="10"
+        />
+
+    <!-- last known values cache (prime and not prime) -->
+    <cache
+        name="LastCache"
+        maxEntriesLocalHeap="10"
+        timeToIdleSeconds="10"
+        timeToLiveSeconds="10"
+        />
+
+    <!-- value primes factors, indexed by the value -->
+    <cache
+        name="FactorsCache"
+        maxEntriesLocalHeap="5000"
+        timeToIdleSeconds="3600"
+        timeToLiveSeconds="7200"
         />
 
 
