@@ -80,7 +80,7 @@ class PrimesServlet extends PrimesscalatraappStack {
       <body>
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
         <p>
-          <i><a href={url("/check",includeContextPath=false)}>Again</a></i> -
+          <i><a href={url("/check")}>Again</a></i> -
           <i><a href={url("/")}>Back to the menu</a></i>
         </p>
       </body>
