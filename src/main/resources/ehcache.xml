@@ -19,6 +19,7 @@
         maxEntriesLocalHeap="10000"
 		timeToIdleSeconds="600"
 		timeToLiveSeconds="3600"
+        statistics="true"
         />
 
     <!-- prime values cache, indexed by the position -->
@@ -27,6 +28,7 @@
         maxEntriesLocalHeap="10000"
         timeToIdleSeconds="600"
         timeToLiveSeconds="3600"
+        statistics="true"
         />
 
     <!-- various counters temporary cache -->
@@ -35,6 +37,7 @@
         maxEntriesLocalHeap="10"
         timeToIdleSeconds="10"
         timeToLiveSeconds="10"
+        statistics="true"
         />
 
     <!-- last known values cache (prime and not prime) -->
@@ -43,6 +46,7 @@
         maxEntriesLocalHeap="10"
         timeToIdleSeconds="10"
         timeToLiveSeconds="10"
+        statistics="true"
         />
 
     <!-- value primes factors, indexed by the value -->
@@ -51,6 +55,7 @@
         maxEntriesLocalHeap="5000"
         timeToIdleSeconds="3600"
         timeToLiveSeconds="7200"
+        statistics="true"
         />
 
 
