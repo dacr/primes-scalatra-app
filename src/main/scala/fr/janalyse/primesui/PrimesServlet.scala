@@ -66,7 +66,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
-        <p><i><a href={url("/",includeContextPath=false)}>Back to the menu</a></i></p>
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
@@ -80,8 +80,8 @@ class PrimesServlet extends PrimesscalatraappStack {
       <body>
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
         <p>
-          <i><a href={url("/")}>Again</a></i> -
-          <i><a href={url("/",includeContextPath=false)}>Back to the menu</a></i>
+          <i><a href={url("/check",includeContextPath=false)}>Again</a></i> -
+          <i><a href={url("/")}>Back to the menu</a></i>
         </p>
       </body>
     </html>
@@ -100,7 +100,7 @@ class PrimesServlet extends PrimesscalatraappStack {
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
         this page simulate a slow server with a minimum response time of{ secs }
         seconds
-        <p><i><a href={url("/",includeContextPath=false)}>Back to the menu</a></i></p>
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
@@ -113,7 +113,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>{ value } is the { nth }th prime</h1>
-        <p><i><a href={url("/",includeContextPath=false)}>Back to the menu</a></i></p>
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
@@ -128,7 +128,7 @@ class PrimesServlet extends PrimesscalatraappStack {
           if (factors.isEmpty) <h1>{ num } = { num } <i>and is prime</i> </h1>
           else <h1>{ num } = { factors.mkString(" * ") }</h1>
         }
-        <p><i><a href={url("/",includeContextPath=false)}>Back to the menu</a></i></p>
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
@@ -139,7 +139,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>Primes generator state : {engine.populate(upto)}</h1>
-        <p><i><a href={url("/",includeContextPath=false)}>Back to the menu</a></i></p>
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
