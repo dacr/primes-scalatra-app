@@ -35,6 +35,7 @@ class PrimesServlet extends PrimesscalatraappStack {
                 check a <a href={url("/check")}>random value</a>.
           </li>
           <li><b>slowcheck/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds at server side, this is for test purposes</li>
+          <li><b>leakedcheck/</b><i>$num</i>/<i>$howmany</i> : to test if <i>$num</i> is a prime number or not, and leak <i>$howmany</i> megabytes at server side, this is for test purposes, default is 1Mb</li>
           <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
           <li><b>factors/</b><i>$num</i> : to get the primer factors of <i>$num</i></li>
 <!--
@@ -98,13 +99,34 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
-        this page simulate a slow server with a minimum response time of{ secs }
+        this page simulates a slow server with a minimum response time of{ secs }
+        seconds
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
+      </body>
+    </html>
+  }
+  
+  
+  var leak=List.empty[Array[Byte]]
+  
+  get("/leakedcheck/:num/:howmany") {
+    val engine = request.engine
+    val howmany = params.get("howmany").map(_.toInt).getOrElse(1)
+    leak=(Array.fill[Byte](1024 * 1024 * howmany)(0x1))::leak
+    val num = params("num").toLong
+    val value = engine.check(num)
+    val isPrime = value.map(_.isPrime).getOrElse(false)
+    <html>
+      <body>
+        <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
+        this page simulates a memory leak, you've just lost { howmany } megabytes !
         seconds
         <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
 
+  
   get("/prime/:nth") {
     val engine = request.engine
     val nth = params("nth").toLong
