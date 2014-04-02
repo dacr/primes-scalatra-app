@@ -78,9 +78,14 @@ trait PrimesDBApi {
 
 
 trait PrimesDBInit {
+  import util.Properties._
+  val dbHost=propOrNone("PRIMES_DB_HOST")
+               .orElse(envOrNone("PRIMES_DB_HOST"))
+	       .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))
+               .getOrElse("localhost")
   val dbUsername = "optimus"
   val dbPassword = "bumblebee"
-  val dbUrl = "jdbc:mysql://localhost/primes"
+  val dbUrl = s"jdbc:mysql://$dbHost/primes"
 
   private var cpdsopt: Option[ComboPooledDataSource] = None
 
