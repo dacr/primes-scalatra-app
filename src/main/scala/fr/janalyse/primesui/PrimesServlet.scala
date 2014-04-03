@@ -206,7 +206,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     redirect("/")
   }
   
-  post("/big") {
+  get("/big") {
     <html>
       <body>
          <h1>This is a big page, > 3Mb</h1>
