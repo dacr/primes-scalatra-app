@@ -28,8 +28,9 @@ class PrimesServlet extends PrimesscalatraappStack {
         The database cache contains <b>{ engine.valuesCount }</b>
         already checked values, with <b>{ engine.primesCount }</b>
         primes found.
-        The highest found prime is <b>{ engine.lastPrime.map(_.value).getOrElse(-1) }</b>
-        <h2>The API</h2>
+        The highest found prime is <b>{ engine.lastPrime.map(_.value).getOrElse(-1) }</b>.
+        The application cache is <b>{if (engine.isUseCache) "enabled" else "disabled"}</b>.
+        <h2>API</h2>
         <ul>
           <li><b>check/</b><i>$num</i> : to test if <i>$num</i> is a prime number or not.
                 check a <a href={url("/check")}>random value</a>.
@@ -54,6 +55,11 @@ class PrimesServlet extends PrimesscalatraappStack {
 <!--
           <li><b>ulam/</b><i>$size</i> : Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation</li>
 -->
+        </ul>
+
+        <h2>Admin</h2>
+        <ul>
+          <li><a href={url("/config")}>Application configuration</a></li>
         </ul>
       </body>
     </html>
@@ -166,5 +172,37 @@ class PrimesServlet extends PrimesscalatraappStack {
     </html>
   }
 
+  get("/config") {
+    val engine = request.engine
+    <html>
+      <body>
+        <h1>Configuration</h1>
+        <form method="POST"
+              enctype="application/x-www-form-urlencoded; charset=utf-8"
+              action={url("/config")}>
+          { 
+    		if (engine.isUseCache)
+	          <input type="checkbox" name="usecache" value="selected" checked="checked" >
+                 Use application cache
+              </input>
+    		else
+	          <input type="checkbox" name="usecache" value="selected">
+                 Use application cache
+              </input>
+    		  
+          }<br/>
+          <input type="submit" value="Submit"/>
+        </form>
+      </body>
+    </html>
+  }
   
+  post("/config") {
+    val engine = request.engine
+    params.get("usecache") match {
+      case None => engine.setUseCache(false)
+      case _ => engine.setUseCache(true)
+    }
+    redirect("/")
+  }
 }
