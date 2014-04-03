@@ -205,4 +205,17 @@ class PrimesServlet extends PrimesscalatraappStack {
     }
     redirect("/")
   }
+  
+  post("/big") {
+    <html>
+      <body>
+         <h1>This is a big page, > 3Mb</h1>
+{
+  for { _ <- 1 to 50000} yield {
+    <p>123456789123456789123456789012345678901234567890123</p>
+  }
+}
+      </body>
+    </html>
+  }
 }
