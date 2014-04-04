@@ -129,6 +129,10 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
     usingcache(transaction {dbGetPrime(nth).map(conv)}, nth, primesCache)
   }
   
+  def listPrimes(below:Long, above:Long) = {
+    transaction {dbListPrimes(below, above)}
+  }
+  
   // TODO TO FINISH
   private val pgen = new PrimesGenerator[Long]
   def factorize(num:Long):Option[List[Long]] = {

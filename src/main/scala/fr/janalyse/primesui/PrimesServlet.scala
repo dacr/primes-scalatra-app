@@ -39,10 +39,9 @@ class PrimesServlet extends PrimesscalatraappStack {
           <li><b>leakedcheck/</b><i>$num</i>/<i>$howmany</i> : to test if <i>$num</i> is a prime number or not, and leak <i>$howmany</i> megabytes at server side, this is for test purposes, default is 1Mb</li>
           <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
           <li><b>factors/</b><i>$num</i> : to get the primer factors of <i>$num</i></li>
-<!--
-          <li><b>primes/</b><i>$to</i> : list primes up to <i>$to</i></li>
-          <li><b>primes/</b><i>$form</i>/<i>$to</i> : list primes from <i>$from</i> to <i>$to</i></li>
--->
+          <li><b>primes/</b><i>$below</i> : list primes lower than <i>$below</i></li>
+          <li><b>primes/</b><i>$below</i>/<i>$above</i> : list primes which are lower than <i>$below</i> and greater than <i>$above</i></li>
+
           <li><b>populate/</b><i>$upTo</i> : populate the database up to the specified value. Take care it calls a synchronized method.
             Populate up to 
              <a href={url("/populate/10000")}>10K</a>,
@@ -146,6 +145,35 @@ class PrimesServlet extends PrimesscalatraappStack {
     </html>
   }
 
+  def primes(below:Long, above:Long=0L) = {
+    val engine = request.engine
+    val primes = engine.listPrimes(below, above)
+    <html>
+      <body>
+         <h1>Primes number above {above} and below {below}</h1>
+         <ul>
+         {
+		   for { prime <- primes} yield {
+		     <li><pre>{prime.nth} --> {prime.value}</pre></li>
+		   }
+         }
+         </ul>
+      </body>
+    </html>
+  }
+  
+  get("/primes/:below/:above") {
+    val below = params.get("below").map(_.toLong).getOrElse(10000L)
+    val above = params.get("above").map(_.toLong).getOrElse(0L)
+    primes(below, above)
+  }
+
+  get("/primes/:below") {
+    val below = params.get("below").map(_.toLong).getOrElse(10000L)
+    primes(below)
+  }
+
+  
   get("/factors/:num") {
     val engine = request.engine
     val num = params("num").toLong
