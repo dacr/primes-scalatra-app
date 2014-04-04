@@ -58,5 +58,14 @@
         statistics="true"
         />
 
+    <!-- ulam image cache, indexed by the size -->
+    <cache
+        name="UlamCache"
+        maxEntriesLocalHeap="500"
+        timeToIdleSeconds="3600"
+        timeToLiveSeconds="0"
+        statistics="true"
+        />
+
 
 </ehcache>

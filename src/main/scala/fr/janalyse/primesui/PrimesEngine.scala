@@ -49,7 +49,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   private lazy val primesCache = cache.getCache("PrimesCache")
   private lazy val lastCache = cache.getCache("LastCache")
   private lazy val factorsCache = cache.getCache("FactorsCache")
-  
+  private lazy val ulamCache = cache.getCache("UlamCache")
   
   private def populatePrimesIfRequired(upTo: Long = 100000) = {
     val pgen = new PrimesGenerator[Long]
@@ -130,7 +130,27 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   }
   
   def listPrimes(below:Long, above:Long) = {
-    transaction {dbListPrimes(below, above)}
+    transaction {dbListPrimes(below, above)}.map(conv)
+  }
+  
+  private def ulam(sz:Int) = {
+    val pgen = new PrimesGenerator[Long]
+    transaction {
+      val it = dbList(sz*sz).map(conv)
+      val img = pgen.ulamSpiral(sz, it)
+      img
+    }
+  }
+  
+  def ulamAsPNG(sz:Int):Array[Byte] = {
+    usingcache( {
+	    import javax.imageio.ImageIO
+	    import java.io._
+	    val bufferedImage = ulam(sz)
+	    val out = new ByteArrayOutputStream()
+	    ImageIO.write(bufferedImage, "PNG", out)
+	    out.toByteArray
+    }, sz, ulamCache)
   }
   
   // TODO TO FINISH

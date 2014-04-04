@@ -51,9 +51,14 @@ class PrimesServlet extends PrimesscalatraappStack {
              <a href={url("/populate/250000")}>250K</a>,
              <a href={url("/populate/500000")}>500K</a>
           </li>
-<!--
-          <li><b>ulam/</b><i>$size</i> : Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation</li>
--->
+          <li><b>ulam/</b><i>$size</i> : Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation.
+            Example for various size :
+              <a href={url("/ulam/128")}>128</a>, 
+              <a href={url("/ulam/256")}>256</a>, 
+              <a href={url("/ulam/512")}>512</a>,
+              <a href={url("/ulam/1024")}>1024</a> 
+          </li>
+
         </ul>
 
         <h2>Admin</h2>
@@ -200,6 +205,14 @@ class PrimesServlet extends PrimesscalatraappStack {
     </html>
   }
 
+  get("/ulam/:sz") {
+    val engine = request.engine
+    val sz = params.get("sz").map(_.toInt).getOrElse(100)
+    val bytes = engine.ulamAsPNG(sz)
+    contentType = "image/png"
+    response.getOutputStream().write(bytes)
+  }
+  
   get("/config") {
     val engine = request.engine
     <html>

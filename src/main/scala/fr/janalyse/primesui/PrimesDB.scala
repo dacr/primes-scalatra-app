@@ -76,13 +76,23 @@ trait PrimesDBApi {
       ).headOption
       
   def dbListPrimes(below:Long, above:Long=0L) = {
-    val q = from(cachedValues) (cv =>
+    val qry = from(cachedValues) (cv =>
       where( cv.isPrime === true and (cv.value gte above) and (cv.value lte below))
       select(cv)
       orderBy(cv.value asc)
       )
-    q.toList
+    qry.toIterator
   }
+  
+  def dbList(below:Long, above:Long=0L) = {
+    val qry = from(cachedValues) (cv =>
+      where( (cv.value gte above) and (cv.value lte below))
+      select(cv)
+      orderBy(cv.value asc)
+      )
+    qry.toIterator
+  }
+
 }
 
 
