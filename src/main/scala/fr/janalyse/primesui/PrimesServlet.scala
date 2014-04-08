@@ -1,7 +1,6 @@
 package fr.janalyse.primesui
 
 import org.scalatra._
-import scalate.ScalateSupport
 import javax.sql.DataSource
 import javax.naming.InitialContext
 import com.mchange.v2.c3p0.ComboPooledDataSource
