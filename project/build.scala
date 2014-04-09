@@ -41,6 +41,7 @@ object PrimesscalatraappBuild extends Build {
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))
       ).map(
           _.exclude("org.scala-lang", "scala-compiler")
+           .exclude("org.scala-lang", "scala-reflect")
            .exclude("com.typesafe.akka", "akka-actor_2.10")
             )
       

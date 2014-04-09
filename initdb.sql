@@ -3,6 +3,8 @@ DROP DATABASE IF EXISTS primes;
 
 CREATE DATABASE primes;
 GRANT ALL PRIVILEGES ON primes.* TO 'optimus'@'localhost' identified by 'bumblebee' ;
+# -- /!\ add privileges on the right network interface, the one use for remove access !!
+
 FLUSH PRIVILEGES;
 
 USE primes;
