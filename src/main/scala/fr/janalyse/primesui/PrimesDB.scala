@@ -109,7 +109,7 @@ trait PrimesDBInit {
   private var cpdsopt: Option[ComboPooledDataSource] = None
 
   protected def dbSetup() = {
-    val cpds = new ComboPooledDataSource
+    val cpds = new ComboPooledDataSource("primes-ds")
     cpds.setDriverClass("com.mysql.jdbc.Driver")
     cpds.setJdbcUrl(dbUrl)
     cpds.setUser(dbUsername)
