@@ -289,7 +289,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 
 
   get("/big/:howmany") {
-    val howmanyKB = params.get("below").map(_.toInt).getOrElse(3*1024)
+    val howmanyKB = params.get("howmany").map(_.toInt).getOrElse(3*1024)
     big(howmanyKB)
   }
 
