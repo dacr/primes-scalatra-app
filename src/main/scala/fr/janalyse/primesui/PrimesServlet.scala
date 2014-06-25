@@ -24,6 +24,9 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>Primes web application is ready.</h1>
+    <p style="color:red"><b><i>classic webapp / mysql release of primes ui web application, classical design.</i></b>
+    </p>
+
         The database cache contains <b>{ engine.valuesCount }</b>
         already checked values, with <b>{ engine.primesCount }</b>
         primes found.
@@ -35,7 +38,7 @@ class PrimesServlet extends PrimesscalatraappStack {
                 check a <a href={url("/check")}>random value</a>.
           </li>
           <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
-          <li><b>factors/</b><i>$num</i> : to get the primer factors of <i>$num</i></li>
+          <li><b>factors/</b><i>$num</i> : to get the prime factors of <i>$num</i></li>
           <li><b>primes/</b><i>$below</i> : list primes lower than <i>$below</i></li>
           <li><b>primes/</b><i>$below</i>/<i>$above</i> : list primes which are lower than <i>$below</i> and greater than <i>$above</i></li>
 
