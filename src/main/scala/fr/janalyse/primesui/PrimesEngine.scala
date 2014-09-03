@@ -38,7 +38,16 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
     CacheManager.getInstance().shutdown()
   }
   
-  private var useCaches=false
+  private var useCaches= try {
+    import scala.util.Properties._
+    propOrNone("PRIMESUI-CACHE")
+       .orElse(envOrNone("PRIMESUI-CACHE"))
+       .map(_.toBoolean)
+       .getOrElse(false)
+  } catch {
+    case ex:Exception => false
+  }
+  
   def isUseCache():Boolean = useCaches
   def setUseCache(v:Boolean) {useCaches=v}
 
