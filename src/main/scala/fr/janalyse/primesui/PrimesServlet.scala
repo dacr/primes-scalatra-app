@@ -14,6 +14,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   implicit class PrimesEngineRequest( request : ServletRequest ) {
     def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
+    def dbpool : Option[DataSource] = request.getServletContext().getAttribute( PrimesDBInit.KEY ).asInstanceOf[Option[DataSource]]
   }
   
   val rnd = scala.util.Random
@@ -62,9 +63,10 @@ class PrimesServlet extends PrimesscalatraappStack {
         </ul>
         <h2>For testing purposes...</h2>
           <ul>
-            <li><b>slowcheck/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds at server side, this is for test purposes, default is 1 second</li>
-            <li><b>leakedcheck/</b><i>$num</i>/<i>$howmany</i> : to test if <i>$num</i> is a prime number or not, and leak <i>$howmany</i> megabytes at server side, this is for test purposes, default is 1Mb</li>
-            <li><b>big/</b><i></i>$howmanyKB : to test a response with an approximative size of <i>$howmany</i> kilobytes, default is 3Mb</li>
+            <li><b>slowcheck/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds at server side, this is for test purposes, default is 1 second.</li>
+            <li><b>slowsql/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds inside the database, this is for test purposes, default is 1 second, <b>cache feature is not used</b>.</li>
+            <li><b>leakedcheck/</b><i>$num</i>/<i>$howmany</i> : to test if <i>$num</i> is a prime number or not, and leak <i>$howmany</i> megabytes at server side, this is for test purposes, default is 1Mb.</li>
+            <li><b>big/</b><i></i>$howmanyKB : to test a response with an approximative size of <i>$howmany</i> kilobytes, default is 3Mb.</li>
           </ul>
         <h2>Admin</h2>
         <ul>
@@ -133,6 +135,39 @@ class PrimesServlet extends PrimesscalatraappStack {
     slowcheck(nextInt)
   }
 
+
+  
+  def slowsql(num:Long, secs:Long=1L) = {
+    val engine = request.engine
+    val dbpool = request.dbpool
+    val value = engine.slowsqlcheck(num, dbpool, secs)
+    val isPrime = value.map(_.isPrime).getOrElse(false)
+    <html>
+      <body>
+        <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
+        this page simulates a slow database with a minimum response time of { secs }
+        seconds
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
+      </body>
+    </html>
+  }
+
+  get("/slowsql/:num/:secs") {
+    val secs = params.get("secs").map(_.toLong).getOrElse(1L)
+    val num = params("num").toLong
+    slowsql(num, secs)    
+  }
+  get("/slowsql/:num") {
+    val num = params("num").toLong
+    slowsql(num)
+  }
+
+  get("/slowsql") {
+    slowsql(nextInt)
+  }
+
+  
+  
   var leak=List.empty[Array[Byte]]
   
   def leakedcheck(num:Long, howmany:Int=1) = {

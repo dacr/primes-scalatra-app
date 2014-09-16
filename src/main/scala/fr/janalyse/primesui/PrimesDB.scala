@@ -95,6 +95,9 @@ trait PrimesDBApi {
 
 }
 
+object PrimesDBInit {
+  val KEY="DBPOOL"  
+}
 
 trait PrimesDBInit {
   import util.Properties._
@@ -106,7 +109,8 @@ trait PrimesDBInit {
   val dbPassword = "bumblebee"
   val dbUrl = s"jdbc:mysql://$dbHost/primes"
 
-  private var cpdsopt: Option[ComboPooledDataSource] = None
+  //private var pool: Option[ComboPooledDataSource] = None
+  var dbpool: Option[ComboPooledDataSource] = None
 
   protected def dbSetup() = {
     val cpds = new ComboPooledDataSource("primes-ds")
@@ -117,12 +121,12 @@ trait PrimesDBInit {
     
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
     SessionFactory.concreteFactory = Some(() => connection)
-    cpdsopt = Some(cpds)
+    dbpool = Some(cpds)
   }
 
   protected def dbTeardown() {
-    cpdsopt.foreach(_.close)
-    cpdsopt = None
+    dbpool.foreach(_.close)
+    dbpool = None
   }
 
 }

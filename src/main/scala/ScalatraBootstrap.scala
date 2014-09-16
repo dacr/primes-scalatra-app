@@ -10,6 +10,7 @@ class ScalatraBootstrap extends LifeCycle with PrimesDBInit {
     val pe = new PrimesEngine()
     pe.setup()
     context.setAttribute(PrimesEngine.KEY, pe)
+    context.setAttribute(PrimesDBInit.KEY, dbpool)
   }
 
   override def destroy(context: ServletContext) {
