@@ -146,7 +146,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   def slowsqlcheck(num: Long, dbpool: Option[DataSource], secs: Long): Option[CheckedValue[Long]] = {
     for { dbp <- dbpool } yield using(dbp.getConnection()) { conn =>
       using(conn.createStatement()) { stmt =>
-        val sql = s"""select *,sleep($secs) as dummy from cachedvalue where value = $num"""
+        val sql = s"""select *,sleep($secs) as dummy from CachedValue where value = $num"""
         using(stmt.executeQuery(sql)) { rs =>
           rs.next()
           val isPrime = rs.getBoolean("isPrime")

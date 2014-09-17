@@ -118,6 +118,10 @@ trait PrimesDBInit {
     cpds.setJdbcUrl(dbUrl)
     cpds.setUser(dbUsername)
     cpds.setPassword(dbPassword)
+    cpds.setMaxPoolSize(500)
+    cpds.setMinPoolSize(10)
+    cpds.setInitialPoolSize(10)
+    cpds.setMaxIdleTime(30)
     
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
     SessionFactory.concreteFactory = Some(() => connection)
