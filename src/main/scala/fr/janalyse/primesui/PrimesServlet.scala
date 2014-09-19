@@ -25,7 +25,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1>Primes web application is ready.</h1>
-    <p style="color:red"><b><i>classic webapp / mysql release of primes ui web application, classical design.</i></b>
+    <p style="color:red"><b><i>classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
     </p>
 
         The database cache contains <b>{ engine.valuesCount }</b>
@@ -39,10 +39,16 @@ class PrimesServlet extends PrimesscalatraappStack {
                 check a <a href={url("/check")}>random value</a>.
           </li>
           <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
-          <li><b>factors/</b><i>$num</i> : to get the prime factors of <i>$num</i></li>
-          <li><b>primes/</b><i>$below</i> : list primes lower than <i>$below</i></li>
+          <li><b>factors/</b><i>$num</i> : to get the prime factors of <i>$num</i>.
+                Factorize a <a href={url("/factors")}>random value</a>.
+          </li>
+          <li><b>primes/</b><i>$below</i> : list primes lower than <i>$below</i>. List up to 
+             <a href={url("/primes/1000")}>1K</a>,
+             <a href={url("/primes/25000")}>25K</a>,
+             <a href={url("/primes/50000")}>50K</a>,
+             <a href={url("/primes/100000")}>100K</a>
+          </li>
           <li><b>primes/</b><i>$below</i>/<i>$above</i> : list primes which are lower than <i>$below</i> and greater than <i>$above</i></li>
-
           <li><b>populate/</b><i>$upTo</i> : populate the database up to the specified value. Take care it calls a synchronized method.
             Populate up to 
              <a href={url("/populate/10000")}>10K</a>,
@@ -226,6 +232,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 		   }
          }
          </ul>
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
@@ -256,6 +263,25 @@ class PrimesServlet extends PrimesscalatraappStack {
       </body>
     </html>
   }
+  
+  get("/factors") {
+    val engine = request.engine
+    val num = nextInt
+    val factors = engine.factorize(num).get // TODO : DANGEROUS 
+    <html>
+      <body>
+        {
+          if (factors.isEmpty) <h1>{ num } = { num } <i>and is prime</i> </h1>
+          else <h1>{ num } = { factors.mkString(" * ") }</h1>
+        }
+        <p>
+          <i><a href={url("/factors")}>Again</a></i> -
+          <i><a href={url("/")}>Back to the menu</a></i>
+        </p>
+      </body>
+    </html>
+  }
+  
   
   get("/populate/:upto") {
     val engine = request.engine
@@ -321,6 +347,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     <p>1234567891234567891234567890123456789012345678901234567</p>
   }
 }
+        <p><i><a href={url("/")}>Back to the menu</a></i></p>
       </body>
     </html>
   }
