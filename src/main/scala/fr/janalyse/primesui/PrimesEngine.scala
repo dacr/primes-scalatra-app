@@ -163,7 +163,10 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   }
 
   def listPrimes(below: Long, above: Long) = {
-    transaction { dbListPrimes(below, above) }.map(conv)
+    // the Iterator must be converted (evaluated) before exiting the transaction
+    // this is done by the .toList.
+    // Because whhen exiting the transaction, the result set is closed !
+    transaction { dbListPrimes(below, above).toList }.map(conv)
   }
 
   private def ulam(sz: Int) = {
