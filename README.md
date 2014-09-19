@@ -37,8 +37,10 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    If not set, the default value is false.
 
  * To specify a remote database, you can either use :
-   - **PRIMES_DB_HOST** java system property
-   - **PRIMES_DB_HOST** environment variable
-   - **OPENSHIFT_MYSQL_DB_HOST** environment variable
-   
+   - **PRIMES_DB_HOST** and **PRIMES_DB_PORT** java system properties
+   - **PRIMES_DB_HOST** and **PRIMES_DB_PORT** environment variable
+   - **OPENSHIFT_MYSQL_DB_HOST** and **OPENSHIFT_MYSQL_DB_PORT** environment variables
+   - defaults are : localhost and 3306
+
+
 
