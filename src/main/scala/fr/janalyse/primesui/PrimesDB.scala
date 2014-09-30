@@ -100,29 +100,66 @@ object PrimesDBInit {
 
 trait PrimesDBInit {
   import util.Properties._
-  val dbHost = propOrNone("PRIMES_DB_HOST")
-    .orElse(envOrNone("PRIMES_DB_HOST"))
-    .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))
-    .getOrElse("localhost")
 
-  val dbPort = propOrNone("PRIMES_DB_PORT")
-    .orElse(envOrNone("PRIMES_DB_PORT"))
-    .orElse(envOrNone("OPENSHIFT_MYSQL_DB_PORT"))
-    .getOrElse("3306").toInt
+  val dsName = "primes-ds"
 
-  val dbUsername = "optimus"
-  val dbPassword = "bumblebee"
-  val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/primes"
+  def classicPoolBuild():ComboPooledDataSource = {
+    val dbHost = None
+      .orElse(propOrNone("PRIMES_DB_HOST"))
+      .orElse(envOrNone("PRIMES_DB_HOST"))
+      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))
+      .orElse(propOrNone("RDS_HOSTNAME")) // AWS
+      .getOrElse("localhost")
+
+    val dbPort = None
+      .orElse(propOrNone("PRIMES_DB_PORT"))
+      .orElse(envOrNone("PRIMES_DB_PORT"))
+      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_PORT"))
+      .orElse(propOrNone("RDS_PORT")) // AWS
+      .getOrElse("3306").toInt
+
+    val dbUsername = None
+      .orElse(envOrNone("PRIMES_DB_USERNAME"))
+      .orElse(propOrNone("PRIMES_DB_USERNAME"))
+      .orElse(propOrNone("RDS_USERNAME")) // AWS
+      .getOrElse("optimus")
+
+    val dbPassword = None
+      .orElse(envOrNone("PRIMES_DB_PASSWORD"))
+      .orElse(propOrNone("PRIMES_DB_PASSWORD"))
+      .orElse(propOrNone("RDS_PASSWORD")) // AWS
+      .getOrElse("bumblebee")
+
+    val dbName = None
+      .orElse(envOrNone("PRIMES_DB_NAME"))
+      .orElse(propOrNone("PRIMES_DB_NAME"))
+      .orElse(propOrNone("RDS_DB_NAME")) // AWS
+      .getOrElse("primes")
+
+    val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName"
+
+    val cpds = new ComboPooledDataSource(dsName)
+    cpds.setJdbcUrl(dbUrl)
+    cpds.setUser(dbUsername)
+    cpds.setPassword(dbPassword)
+    cpds
+  }
+
+  def viaUrlPoolBuild():Option[ComboPooledDataSource] = {
+    for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING") } yield {
+      val cpds = new ComboPooledDataSource(dsName)
+      cpds.setJdbcUrl(dbUrl)
+      cpds
+      }
+  }
+
 
   //private var pool: Option[ComboPooledDataSource] = None
   var dbpool: Option[ComboPooledDataSource] = None
 
   protected def dbSetup() = {
-    val cpds = new ComboPooledDataSource("primes-ds")
+    val cpds = viaUrlPoolBuild() getOrElse classicPoolBuild()
     cpds.setDriverClass("com.mysql.jdbc.Driver")
-    cpds.setJdbcUrl(dbUrl)
-    cpds.setUser(dbUsername)
-    cpds.setPassword(dbPassword)
     cpds.setMaxPoolSize(50)
     cpds.setMinPoolSize(10)
     cpds.setInitialPoolSize(10)
@@ -130,6 +167,13 @@ trait PrimesDBInit {
 
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
     SessionFactory.concreteFactory = Some(() => connection)
+    try {
+      transaction {
+        PrimesDB.create
+      }
+    } catch {
+      case e:Exception => // Probably already created - TODO enhanhcements required
+    }
     dbpool = Some(cpds)
   }
 
