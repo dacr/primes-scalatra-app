@@ -35,7 +35,7 @@ object PrimesscalatraappBuild extends Build {
         "com.mchange" % "c3p0" % "0.9.5-pre8",
         "net.sf.ehcache" % "ehcache-core" % "2.6.8",
         "javax.transaction" % "jta" % "1.1", // required for ehcache
-        "mysql" % "mysql-connector-java" % "5.1.28",
+        "mysql" % "mysql-connector-java" % "5.1.33",
         "ch.qos.logback" % "logback-classic" % "1.0.6" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))
