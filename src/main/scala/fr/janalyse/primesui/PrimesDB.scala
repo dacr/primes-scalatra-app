@@ -123,7 +123,7 @@ trait PrimesDBInit {
     cpds.setJdbcUrl(dbUrl)
     cpds.setUser(dbUsername)
     cpds.setPassword(dbPassword)
-    cpds.setMaxPoolSize(50)
+    cpds.setMaxPoolSize(200)
     cpds.setMinPoolSize(10)
     cpds.setInitialPoolSize(10)
     cpds.setMaxIdleTime(30)
