@@ -102,8 +102,10 @@ trait PrimesDBInit {
   import util.Properties._
 
   val dsName = "primes-ds"
+  val driver = "com.mysql.jdbc.Driver"
 
-  def classicPoolBuild():ComboPooledDataSource = {
+
+  private def classicPoolBuild():ComboPooledDataSource = {
     val dbHost = None
       .orElse(propOrNone("PRIMES_DB_HOST"))
       .orElse(envOrNone("PRIMES_DB_HOST"))
@@ -136,20 +138,21 @@ trait PrimesDBInit {
       .orElse(propOrNone("RDS_DB_NAME")) // AWS
       .getOrElse("primes")
 
-    val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName"
+    val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName?user=$dbUsername&password=$dbPassword"
+    //val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName"
 
     val cpds = new ComboPooledDataSource(dsName)
-    cpds.setDriverClass("com.mysql.jdbc.Driver")
+    cpds.setDriverClass(driver)
     cpds.setJdbcUrl(dbUrl)
-    cpds.setUser(dbUsername)
-    cpds.setPassword(dbPassword)
+    //cpds.setUser(dbUsername)
+    //cpds.setPassword(dbPassword)
     cpds
   }
 
-  def viaUrlPoolBuild():Option[ComboPooledDataSource] = {
+  private def viaUrlPoolBuild():Option[ComboPooledDataSource] = {
     for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING") } yield {
       val cpds = new ComboPooledDataSource(dsName)
-      cpds.setDriverClass("com.mysql.jdbc.Driver")
+      cpds.setDriverClass(driver)
       cpds.setJdbcUrl(dbUrl)
       cpds
       }
@@ -160,6 +163,7 @@ trait PrimesDBInit {
   var dbpool: Option[ComboPooledDataSource] = None
 
   protected def dbSetup() = {
+    Class.forName(driver).newInstance()
     val cpds = viaUrlPoolBuild() getOrElse classicPoolBuild()
     cpds.setMaxPoolSize(20)
     cpds.setMinPoolSize(0)

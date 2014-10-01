@@ -43,6 +43,7 @@ object PrimesscalatraappBuild extends Build {
           _.exclude("org.scala-lang", "scala-compiler")
            .exclude("org.scala-lang", "scala-reflect")
            .exclude("com.typesafe.akka", "akka-actor_2.10")
+	   .exclude("org.scala-lang", "jline")
             )
       
       /*,
