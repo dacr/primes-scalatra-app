@@ -59,15 +59,19 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   private lazy val factorsCache = cache.getCache("FactorsCache")
   private lazy val ulamCache = cache.getCache("UlamCache")
 
-  private def populatePrimesIfRequired(upTo: Long = 100000) = {
+  private def populatePrimesIfRequired(upTo: Long = 100000, grouped:Int = 1000) = {
     val pgen = new PrimesGenerator[Long]
     val fall = future {
       var resumedStream = transaction {
         pgen.checkedValues(dbLastPrime.map(conv), dbLastNotPrime.map(conv))
       }
       while (resumedStream.head.value <= upTo) {
-        transaction { dbAddValue(conv(resumedStream.head)) }
-        resumedStream = resumedStream.tail
+        transaction {
+	  (1 to grouped) foreach { _ => 
+	     dbAddValue(conv(resumedStream.head)) 
+             resumedStream = resumedStream.tail
+	  }
+	}
       }
       'done
     }
