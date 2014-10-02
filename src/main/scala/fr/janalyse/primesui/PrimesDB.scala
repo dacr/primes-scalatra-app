@@ -150,7 +150,7 @@ trait PrimesDBInit {
   }
 
   private def viaUrlPoolBuild():Option[ComboPooledDataSource] = {
-    for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING") } yield {
+    for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0) } yield {
       val cpds = new ComboPooledDataSource(dsName)
       cpds.setDriverClass(driver)
       cpds.setJdbcUrl(dbUrl)
