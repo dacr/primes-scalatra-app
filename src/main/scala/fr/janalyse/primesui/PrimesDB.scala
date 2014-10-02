@@ -23,7 +23,7 @@ object PrimesDB extends Schema {
   on(cachedValues)(cp => declare(
     cp.value is (unique, indexed),
     cp.isPrime is (indexed),
-    cp.nth is (unique, indexed)))
+    cp.nth is (indexed)))
 
 }
 
