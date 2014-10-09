@@ -1,5 +1,7 @@
 # primes-scalatra-app #
 
+You can directly play with this application on AWS : [http://primesui.elasticbeanstalk.com/](http://primesui.elasticbeanstalk.com/), dangerous features (for the server) are disabled.
+
 ## Build & Run locally ##
 
 ```sh
