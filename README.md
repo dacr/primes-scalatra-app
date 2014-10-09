@@ -24,23 +24,30 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
 
 ## Requirements  ##
 
- - create the required mysql user and database, using such command :
- 
+ - The minimum is to have the user, its password and the database name, primesui can automatically create the tables and required indexes.
+ - or create the required mysql user and database, using such command :
    ```
    mysql -h localhost -uroot < initdb.sql
    ```
 
+
 ## Configuration ##
 
- * **PRIMESUI-CACHE** environment variable or java system properties can be used in order
+ * **PRIMESUI_CACHE** environment variable or java system properties can be used in order
    to control the initial state of the primes application cache (used or not used).
    If not set, the default value is false.
 
+ * **PRIMESUI_TESTING** environment variable or java system properties can be used enable
+   dangerous features that simulates problems (mem leak, slow requests, ...).
+   If not set, the default value is true.
+
  * To specify a remote database, you can either use :
-   - **PRIMES_DB_HOST** and **PRIMES_DB_PORT** java system properties
-   - **PRIMES_DB_HOST** and **PRIMES_DB_PORT** environment variable
-   - **OPENSHIFT_MYSQL_DB_HOST** and **OPENSHIFT_MYSQL_DB_PORT** environment variables
-   - defaults are : localhost and 3306
+   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** java system properties
+   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** environment variable
+   - If not set, primesui will try to use, either : 
+     - **OPENSHIFT_MYSQL_DB_HOST** and **OPENSHIFT_MYSQL_DB_PORT** environment variables (when used with Redhat openshift systems)
+     - **RDS_HOSTNAME**, **RDS_PORT**, **RDS_USERNAME**, **RDS_PASSWORD** and **RDS_DB_NAME** environment variables (when used with  AWS systems)
+   - defaults are : localhost, 3306 for the port, and primes for the database name
 
 
 

@@ -121,8 +121,18 @@ class PrimesServlet extends PrimesscalatraappStack {
     </html>
   }
 
+  private def forTestingOnly(proc: => xml.NodeSeq):xml.NodeSeq = {
+    if (request.engine.useTesting) proc else {
+      <html>
+        <body>
+	  <h1>Feature disabled...</h1>
+          <p><i>{gotoMenu}</i></p>
+	</body>
+      </html>
+    }
+  }
 
-  def slowcheck(num:Long, secs:Long=1L) = {
+  def slowcheck(num:Long, secs:Long=1L) = forTestingOnly {
     val engine = request.engine
     Thread.sleep(secs * 1000L)
     val value = engine.check(num)
@@ -153,7 +163,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 
 
   
-  def slowsql(num:Long, secs:Long=1L) = {
+  def slowsql(num:Long, secs:Long=1L) = forTestingOnly {
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
@@ -186,7 +196,7 @@ class PrimesServlet extends PrimesscalatraappStack {
   
   var leak=List.empty[Array[Byte]]
   
-  def leakedcheck(num:Long, howmany:Int=1) = {
+  def leakedcheck(num:Long, howmany:Int=1) = forTestingOnly {
     val engine = request.engine
     leak=(Array.fill[Byte](1024 * 1024 * howmany)(0x1))::leak
     val value = engine.check(num)
@@ -294,14 +304,16 @@ class PrimesServlet extends PrimesscalatraappStack {
   
   
   get("/populate/:upto") {
-    val engine = request.engine
-    val upto = params("upto").toLong
-    <html>
-      <body>
-        <h1>Primes generator state : {engine.populate(upto)}</h1>
-        <p><i>{gotoMenu}</i></p>
-      </body>
-    </html>
+    forTestingOnly {
+      val engine = request.engine
+      val upto = params("upto").toLong
+      <html>
+        <body>
+          <h1>Primes generator state : {engine.populate(upto)}</h1>
+          <p><i>{gotoMenu}</i></p>
+        </body>
+      </html>
+    }
   }
 
   get("/ulam/:sz") {
@@ -348,7 +360,7 @@ class PrimesServlet extends PrimesscalatraappStack {
   
 
 
-  def big(howmanyKB:Int=3*1024) = {
+  def big(howmanyKB:Int=3*1024) = forTestingOnly {
     <html>
       <body>
          <h1>This is a big page, > 3Mb</h1>
