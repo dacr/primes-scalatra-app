@@ -166,8 +166,8 @@ trait PrimesDBInit {
     Class.forName(driver).newInstance()
     val cpds = viaUrlPoolBuild() getOrElse classicPoolBuild()
     cpds.setMaxPoolSize(20)
-    cpds.setMinPoolSize(0)
-    cpds.setInitialPoolSize(0)
+    cpds.setMinPoolSize(5)
+    cpds.setInitialPoolSize(5)
     cpds.setMaxIdleTime(30)
 
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
