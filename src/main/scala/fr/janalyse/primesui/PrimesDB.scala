@@ -48,19 +48,36 @@ trait PrimesDBApi {
         compute (count)
     ).single.measures
 
-  def dbLastPrime(): Option[CachedValue] =
-    from(cachedValues)(cv =>
-      where(cv.isPrime === true)
-        select (cv)
-        orderBy (cv.value desc)
-    ).headOption
+//  def dbLastPrime(): Option[CachedValue] =
+//    from(cachedValues)(cv =>
+//      where(cv.isPrime === true)
+//        select (cv)
+//        orderBy (cv.value desc)
+//    ).headOption
 
-  def dbLastNotPrime(): Option[CachedValue] =
-    from(cachedValues)(cv =>
+  def dbLastPrime(): Option[CachedValue] = {
+    val highest = from(cachedValues)(cv =>
+      where(cv.isPrime === true)
+        compute (max(cv.value))
+    ).single.measures
+    highest.flatMap(dbCheck)
+  }
+
+    
+//  def dbLastNotPrime(): Option[CachedValue] =
+//    from(cachedValues)(cv =>
+//      where(cv.isPrime === false)
+//        select (cv)
+//        orderBy (cv.value desc)
+//    ).headOption
+
+  def dbLastNotPrime(): Option[CachedValue] = {
+    val highest = from(cachedValues)(cv =>
       where(cv.isPrime === false)
-        select (cv)
-        orderBy (cv.value desc)
-    ).headOption
+        compute(max(cv.value))
+    ).single.measures
+    highest.flatMap(dbCheck)
+  }
 
   def dbCheck(value: Long): Option[CachedValue] =
     from(cachedValues)(cv =>

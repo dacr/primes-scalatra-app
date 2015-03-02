@@ -71,7 +71,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
 
   private def populatePrimesIfRequired(upTo: Long = 100000, grouped:Int = 1000) = {
     val pgen = new PrimesGenerator[Long]
-    val fall = future {
+    val fall = Future {
       var resumedStream = transaction {
         pgen.checkedValues(dbLastPrime.map(conv), dbLastNotPrime.map(conv))
       }
