@@ -16,7 +16,7 @@
     <!-- checked value cache, indexed by the value -->
     <cache
 		name="CachedValuesCache"
-        maxEntriesLocalHeap="10000"
+        maxEntriesLocalHeap="20000"
 		timeToIdleSeconds="600"
 		timeToLiveSeconds="3600"
         statistics="true"
@@ -25,7 +25,7 @@
     <!-- prime values cache, indexed by the position -->
     <cache
         name="PrimesCache"
-        maxEntriesLocalHeap="10000"
+        maxEntriesLocalHeap="20000"
         timeToIdleSeconds="600"
         timeToLiveSeconds="3600"
         statistics="true"
@@ -35,8 +35,8 @@
     <cache
         name="CountersCache"
         maxEntriesLocalHeap="10"
-        timeToIdleSeconds="10"
-        timeToLiveSeconds="10"
+        timeToIdleSeconds="60"
+        timeToLiveSeconds="60"
         statistics="true"
         />
 
@@ -44,8 +44,8 @@
     <cache
         name="LastCache"
         maxEntriesLocalHeap="10"
-        timeToIdleSeconds="10"
-        timeToLiveSeconds="10"
+        timeToIdleSeconds="60"
+        timeToLiveSeconds="60"
         statistics="true"
         />
 
