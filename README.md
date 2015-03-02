@@ -20,7 +20,7 @@ $ cd primes-scalatra-app
 $ ./sbt package
 ```
 It will generate a file such as : 
-*.../primes-scalatra-app/target/scala-2.10/primesui_2.10-0.1.0.war *
+*.../primes-scalatra-app/target/scala-2.11/primesui_2.11-0.1.1.war*
 Just rename it to **primesui.war** and deploy it. For apache tomcat just drop this file to the following directory
 **.../apache-tomcat/webapps/** 
 
