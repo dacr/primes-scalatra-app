@@ -1,5 +1,9 @@
 
 # 0.1.1
+
+ * dbLastPrime & dbLastNotPrime memory usage fixed : https://github.com/dacr/primes-scalatra-app/issues/1
+ * ehcache improved default cache values
+ 
  * scalatra 2.3.0
  * scala 2.11.5
  * mysql-connector-java 5.1.34
