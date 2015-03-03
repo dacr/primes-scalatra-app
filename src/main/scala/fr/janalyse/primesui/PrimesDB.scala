@@ -10,6 +10,7 @@ import org.squeryl.SessionFactory
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import org.squeryl.adapters.MySQLAdapter
 import fr.janalyse.primes.CheckedValue
+import collection.JavaConversions._
 
 class CachedValue(
   val value: Long,
@@ -121,38 +122,44 @@ trait PrimesDBInit {
   val dsName = "primes-ds"
   val driver = "com.mysql.jdbc.Driver"
 
+  def env = System.getenv.toMap
+  def renvOrNone(re:String):Option[String] = {
+    env.toStream.collect {case (k,v) if re.r.findFirstIn(k).isDefined => v}.headOption
+  }
 
   private def classicPoolBuild():ComboPooledDataSource = {
     val dbHost = None
       .orElse(propOrNone("PRIMES_DB_HOST"))
       .orElse(envOrNone("PRIMES_DB_HOST"))
       .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))
-      .orElse(propOrNone("RDS_HOSTNAME")) // AWS
+      .orElse(propOrNone("RDS_HOSTNAME"))                           // AMAZON AWS
+      .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_ADDR""")) // DOCKER
       .getOrElse("localhost")
 
     val dbPort = None
       .orElse(propOrNone("PRIMES_DB_PORT"))
       .orElse(envOrNone("PRIMES_DB_PORT"))
       .orElse(envOrNone("OPENSHIFT_MYSQL_DB_PORT"))
-      .orElse(propOrNone("RDS_PORT")) // AWS
+      .orElse(propOrNone("RDS_PORT"))                               // AMAZON AWS
+      .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_PORT""")) // DOCKER
       .getOrElse("3306").toInt
 
     val dbUsername = None
       .orElse(envOrNone("PRIMES_DB_USERNAME"))
       .orElse(propOrNone("PRIMES_DB_USERNAME"))
-      .orElse(propOrNone("RDS_USERNAME")) // AWS
+      .orElse(propOrNone("RDS_USERNAME"))                           // AMAZON AWS
       .getOrElse("optimus")
 
     val dbPassword = None
       .orElse(envOrNone("PRIMES_DB_PASSWORD"))
       .orElse(propOrNone("PRIMES_DB_PASSWORD"))
-      .orElse(propOrNone("RDS_PASSWORD")) // AWS
+      .orElse(propOrNone("RDS_PASSWORD"))                           // AMAZON AWS
       .getOrElse("bumblebee")
 
     val dbName = None
       .orElse(envOrNone("PRIMES_DB_NAME"))
       .orElse(propOrNone("PRIMES_DB_NAME"))
-      .orElse(propOrNone("RDS_DB_NAME")) // AWS
+      .orElse(propOrNone("RDS_DB_NAME"))                            // AMAZON AWS
       .getOrElse("primes")
 
     val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName?user=$dbUsername&password=$dbPassword"

@@ -48,7 +48,8 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** environment variable
    - If not set, primesui will try to use, either : 
      - **OPENSHIFT_MYSQL_DB_HOST** and **OPENSHIFT_MYSQL_DB_PORT** environment variables (when used with Redhat openshift systems)
-     - **RDS_HOSTNAME**, **RDS_PORT**, **RDS_USERNAME**, **RDS_PASSWORD** and **RDS_DB_NAME** environment variables (when used with  AWS systems)
+     - **RDS_HOSTNAME**, **RDS_PORT**, **RDS_USERNAME**, **RDS_PASSWORD** and **RDS_DB_NAME** environment variables (when used with AWS systems)
+     - **DOCKER_PRIMES_DB_PORT_\d+_TCP_ADDR**, **DOCKER_PRIMES_DB_PORT_\d+_TCP_PORT** environment variables (when used with DOCKER systems)
    - defaults are : localhost, 3306 for the port, and primes for the database name
 
 
