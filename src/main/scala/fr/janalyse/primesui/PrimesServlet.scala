@@ -87,11 +87,18 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+  
+//  def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) =
+//     <a href={fullUrl("/", includeContextPath=true, includeServletPath=false)}>
+//       Back to the menu
+//     </a>
+
   def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) =
-     <a href={fullUrl("/", includeContextPath=true, includeServletPath=false)}>
+     <a href={url("/.", includeServletPath=false)}>
        Back to the menu
      </a>
 
+  
   get("/check/:num") {
     val engine = request.engine
     val num = params("num").toLong
