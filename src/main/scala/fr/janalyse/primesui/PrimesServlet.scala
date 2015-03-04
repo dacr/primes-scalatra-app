@@ -132,6 +132,12 @@ class PrimesServlet extends PrimesscalatraappStack {
     }
   }
 
+  private def forTestingOnlyWithLimit[T](asked:T)(limit:T)(proc: (T,Option[String]) => xml.NodeSeq):xml.NodeSeq = {
+    if (request.engine.useTesting) proc(asked, None) else proc(limit, Some(s"Limited to $limit max"))
+  }
+
+  
+  
   def slowcheck(num:Long, secs:Long=1L) = forTestingOnly {
     val engine = request.engine
     Thread.sleep(secs * 1000L)
@@ -304,12 +310,13 @@ class PrimesServlet extends PrimesscalatraappStack {
   
   
   get("/populate/:upto") {
-    forTestingOnly {
+    val uptoAsked = params("upto").toLong
+    forTestingOnlyWithLimit(uptoAsked)(2000000L) { (upto, msg) =>
       val engine = request.engine
-      val upto = params("upto").toLong
       <html>
         <body>
           <h1>Primes generator state : {engine.populate(upto)}</h1>
+          {msg.map{m => <p>WARN : {m}</p>}}
           <p><i>{gotoMenu}</i></p>
         </body>
       </html>
