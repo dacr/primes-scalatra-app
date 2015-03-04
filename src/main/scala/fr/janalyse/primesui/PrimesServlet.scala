@@ -311,12 +311,12 @@ class PrimesServlet extends PrimesscalatraappStack {
   
   get("/populate/:upto") {
     val uptoAsked = params("upto").toLong
-    forTestingOnlyWithLimit(uptoAsked)(2000000L) { (upto, msg) =>
+    forTestingOnlyWithLimit(uptoAsked)(math.min(2000000L,uptoAsked)) { (upto, msg) =>
       val engine = request.engine
       <html>
         <body>
           <h1>Primes generator state : {engine.populate(upto)}</h1>
-          {msg.map{m => <p>WARN : {m}</p>}}
+          {msg.map{m => <p>WARN : {m}</p>}.getOrElse(xml.NodeSeq.Empty)}
           <p><i>{gotoMenu}</i></p>
         </body>
       </html>
