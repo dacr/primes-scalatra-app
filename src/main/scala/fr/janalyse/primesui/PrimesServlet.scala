@@ -318,12 +318,12 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   get("/populate/:upto") {
     val uptoAsked = params("upto").toLong
-    val limitMax = 2000000L
+    val limit = 2000000L
     val (upto,msg) =
       if (request.engine.useTesting) 
         uptoAsked->None
       else 
-        math.min(limitMax, uptoAsked)->Some(s"$uptoAsked, authorized maximum is ")
+        math.min(limit, uptoAsked)->Some(s"$uptoAsked asked, authorized maximum is $limit !")
     val engine = request.engine
     
     <html>
