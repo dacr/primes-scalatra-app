@@ -399,4 +399,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     big()  
   }
 
+  get("alive") {
+    <html><body>OK</body></html>
+  }
+
 }
