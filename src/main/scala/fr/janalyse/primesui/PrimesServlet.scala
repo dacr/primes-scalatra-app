@@ -82,6 +82,16 @@ class PrimesServlet extends PrimesscalatraappStack {
         <ul>
           <li><a href={url("/config")}>Application configuration</a></li>
         </ul>
+        {
+          if (!engine.useSession) xml.NodeSeq.Empty else {
+            val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
+              case None => 1L
+              case Some(count) => count+1
+            }
+            request.getSession.setAttribute("count", newcount)
+            <p><i>current user homepage hit count={newcount}</i></p>
+          }
+        }
       </body>
     </html>
   }

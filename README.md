@@ -39,9 +39,14 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    to control the initial state of the primes application cache (used or not used).
    If not set, the default value is false.
 
- * **PRIMESUI_TESTING** environment variable or java system properties can be used enable
+ * **PRIMESUI_TESTING** environment variable or java system properties can be used to enable
    dangerous features that simulates problems (mem leak, slow requests, ...).
    If not set, the default value is true.
+
+ * **PRIMESUI_SESSION** environment variable or java system properties can be used to enable
+   user sessions that will be used to store and show various user related data. This feature
+   helps to test session affinity or application server clusters.
+   If not set, the default is false.
 
  * To specify a remote database, you can either use :
    - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** java system properties

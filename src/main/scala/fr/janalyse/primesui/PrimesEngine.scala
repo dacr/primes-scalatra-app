@@ -47,16 +47,27 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   
   val useTesting = {
     import scala.util.Properties._
-    propOrNone("PRIMESUI_TESTING")
-      .orElse(envOrNone("PRIMESUI_TESTING"))
+    val key="PRIMESUI_TESTING"
+    propOrNone(key)
+      .orElse(envOrNone(key))
+      .map(toBoolean)
+      .getOrElse(true)
+  }
+  
+  val useSession = {
+    import scala.util.Properties._
+    val key="PRIMESUI_SESSION"
+    propOrNone(key)
+      .orElse(envOrNone(key))
       .map(toBoolean)
       .getOrElse(true)
   }
 
   private var useCaches = {
     import scala.util.Properties._
-    propOrNone("PRIMESUI_CACHE")
-      .orElse(envOrNone("PRIMESUI_CACHE"))
+    val key="PRIMESUI_CACHE"
+    propOrNone(key)
+      .orElse(envOrNone(key))
       .map(toBoolean)
       .getOrElse(false)
   }
