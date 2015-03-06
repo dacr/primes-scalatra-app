@@ -45,7 +45,8 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
 
  * **PRIMESUI_SESSION** environment variable or java system properties can be used to enable
    user sessions that will be used to store and show various user related data. This feature
-   helps to test session affinity or application server clusters.
+   helps to test session affinity or application server clusters. If enabled, a message appears
+   on the home page 'current user homepage hit count=x'
    If not set, the default is false.
 
  * To specify a remote database, you can either use :
