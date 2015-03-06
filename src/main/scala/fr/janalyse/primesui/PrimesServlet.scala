@@ -28,7 +28,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     <html>
       <body>
-        <h1>Primes web application is ready.</h1>
+        <h1><a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a> is ready.</h1>
     <p style="color:red"><b><i>classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
     </p>
 
@@ -311,10 +311,6 @@ class PrimesServlet extends PrimesscalatraappStack {
     </html>
   }
   
-  
-  private def forTestingOnlyWithLimit[T](asked:T)(limit:T)(proc: (T,Option[String]) => xml.NodeSeq):xml.NodeSeq = {
-    if (request.engine.useTesting) proc(asked, None) else proc(limit, Some(s"Limited to $limit max"))
-  }
 
   get("/populate/:upto") {
     val uptoAsked = params("upto").toLong
@@ -343,39 +339,42 @@ class PrimesServlet extends PrimesscalatraappStack {
     contentType = "image/png"
     response.getOutputStream().write(bytes)
   }
-  
+
   get("/config") {
-    val engine = request.engine
-    <html>
-      <body>
-        <h1>Configuration</h1>
-        <form method="POST"
-              enctype="application/x-www-form-urlencoded; charset=utf-8"
-              action={url("/config")}>
-          { 
-    		if (engine.isUseCache)
-	          <input type="checkbox" name="usecache" value="selected" checked="checked" >
-                 Use application cache
-              </input>
-    		else
-	          <input type="checkbox" name="usecache" value="selected">
-                 Use application cache
-              </input>
-    		  
-          }<br/>
-          <input type="submit" value="Submit"/>
-        </form>
-      </body>
-    </html>
-  }
-  
-  post("/config") {
-    val engine = request.engine
-    params.get("usecache") match {
-      case None => engine.setUseCache(false)
-      case _ => engine.setUseCache(true)
+    forTestingOnly {
+      val engine = request.engine
+      <html>
+        <body>
+          <h1>Configuration</h1>
+          <form method="POST" enctype="application/x-www-form-urlencoded; charset=utf-8" action={ url("/config") }>
+            {
+              if (engine.isUseCache)
+                <input type="checkbox" name="usecache" value="selected" checked="checked">
+                  Use application cache
+                </input>
+              else
+                <input type="checkbox" name="usecache" value="selected">
+                  Use application cache
+                </input>
+
+            }<br/>
+            <input type="submit" value="Submit"/>
+          </form>
+        <p><i>{gotoMenu}</i></p>
+        </body>
+      </html>
     }
-    redirect("/")
+  }
+
+  post("/config") {
+    forTestingOnly {
+      val engine = request.engine
+      params.get("usecache") match {
+        case None => engine.setUseCache(false)
+        case _    => engine.setUseCache(true)
+      }
+      redirect("/")
+    }
   }
   
 
