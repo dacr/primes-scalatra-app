@@ -80,6 +80,8 @@ class PrimesServlet extends PrimesscalatraappStack {
           </ul>
         <h2>Admin</h2>
         <ul>
+          <li><a href={url("/alive")}>Life page test</a></li>
+          <li><a href={url("/sysinfo")}>System information</a></li>
           <li><a href={url("/config")}>Application configuration</a></li>
         </ul>
         {
@@ -415,7 +417,41 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   get("/alive") {
-    <html><body>OK</body></html>
+    response.setContentType("text/plain")
+    "OK"
+  }
+  
+  val selectedProps = {
+    import collection.JavaConversions._
+    val res = List(
+        "^os[.].*",
+        "^java[.]vm[.].*",
+        "^java[.]vendor[.].*",
+        "^java[.]runtime[.].*"
+        ).map(_.r)
+    val props = System.getProperties.toMap
+    props.filter{case (k,v) =>
+      res.exists(_.findFirstIn(k).isDefined)
+      }
+  }
+  
+  val extendedProps = {
+    import java.lang.management.ManagementFactory
+    val os = ManagementFactory.getOperatingSystemMXBean()
+    val rt = ManagementFactory.getRuntimeMXBean()
+    Map(
+        "extra.availableProcessors"->java.lang.Runtime.getRuntime.availableProcessors.toString(),
+        "extra.sysinfo"->"enabled"
+        )
+  }
+  
+  get("/sysinfo") {
+    response.setContentType("text/plain")
+    if (request.engine.useTesting) {
+      (selectedProps++extendedProps).toList.sorted.map{case (k,v)=> k+"="+v}.mkString("\n")
+    } else {
+      "extra.sysinfo=disabled"
+    }
   }
 
 }

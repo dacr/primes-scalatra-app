@@ -39,11 +39,11 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    to control the initial state of the primes application cache (used or not used).
    If not set, the default value is false.
 
- * **PRIMESUI_TESTING** environment variable or java system properties can be used to enable
+ * **PRIMESUI_TESTING** environment variable or java system property can be used to enable
    dangerous features that simulates problems (mem leak, slow requests, ...).
    If not set, the default value is true.
 
- * **PRIMESUI_SESSION** environment variable or java system properties can be used to enable
+ * **PRIMESUI_SESSION** environment variable or java system property can be used to enable
    user sessions that will be used to store and show various user related data. This feature
    helps to test session affinity or application server clusters. If enabled, a message appears
    on the home page 'current user homepage hit count=x'
@@ -51,7 +51,7 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
 
  * To specify a remote database, you can either use :
    - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** java system properties
-   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** environment variable
+   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** environment variables
    - If not set, primesui will try to use, either : 
      - **OPENSHIFT_MYSQL_DB_HOST** and **OPENSHIFT_MYSQL_DB_PORT** environment variables (when used with Redhat openshift systems)
      - **RDS_HOSTNAME**, **RDS_PORT**, **RDS_USERNAME**, **RDS_PASSWORD** and **RDS_DB_NAME** environment variables (when used with AWS systems)
