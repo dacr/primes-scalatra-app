@@ -6,8 +6,8 @@ import org.scalatra.sbt.PluginKeys._
 object PrimesscalatraappBuild extends Build {
   val Organization = "fr.janalyse"
   val Name = "primesui"
-  val Version = "0.1.1"
-  val ScalaVersion = "2.11.5"
+  val Version = "0.1.2"
+  val ScalaVersion = "2.11.6"
   val ScalatraVersion = "2.3.0"
 
   lazy val project = Project (

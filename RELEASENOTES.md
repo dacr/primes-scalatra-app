@@ -1,4 +1,9 @@
 
+# 0.1.2 (2015-04-08)
+
+ * Externally data source defined support added, through "jdbc/primesui" jndi name
+
+
 # 0.1.1 (2015-02-02)
 
  * dbLastPrime & dbLastNotPrime memory usage fixed : https://github.com/dacr/primes-scalatra-app/issues/1

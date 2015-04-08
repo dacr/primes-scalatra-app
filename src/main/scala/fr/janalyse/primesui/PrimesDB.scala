@@ -5,6 +5,7 @@ import org.squeryl.Schema
 import org.squeryl.annotations.Column
 import java.util.Date
 import java.sql.Timestamp
+import javax.sql.DataSource
 import org.squeryl.Session
 import org.squeryl.SessionFactory
 import com.mchange.v2.c3p0.ComboPooledDataSource
@@ -119,15 +120,12 @@ object PrimesDBInit {
 trait PrimesDBInit {
   import util.Properties._
 
-  val dsName = "primes-ds"
-  val driver = "com.mysql.jdbc.Driver"
-
   def env = System.getenv.toMap
   def renvOrNone(re:String):Option[String] = {
     env.toStream.collect {case (k,v) if re.r.findFirstIn(k).isDefined => v}.headOption
   }
 
-  private def classicPoolBuild():ComboPooledDataSource = {
+  private def internalClassicPoolBuild():ComboPooledDataSource = {
     val dbHost = None
       .orElse(propOrNone("PRIMES_DB_HOST"))
       .orElse(envOrNone("PRIMES_DB_HOST"))
@@ -165,34 +163,52 @@ trait PrimesDBInit {
     val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName?user=$dbUsername&password=$dbPassword"
     //val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName"
 
-    val cpds = new ComboPooledDataSource(dsName)
-    cpds.setDriverClass(driver)
-    cpds.setJdbcUrl(dbUrl)
-    //cpds.setUser(dbUsername)
-    //cpds.setPassword(dbPassword)
-    cpds
+    makeInternalDataSource(dbUrl)
   }
 
-  private def viaUrlPoolBuild():Option[ComboPooledDataSource] = {
-    for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0) } yield {
+  
+  private def internalViaUrlPoolBuild():Option[ComboPooledDataSource] = {
+    for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0) } yield makeInternalDataSource(dbUrl)
+  }
+  
+  private def makeInternalDataSource(url:String):ComboPooledDataSource = {
+      val dsName = "primes-ds"
+      val driver = "com.mysql.jdbc.Driver"
+      Class.forName(driver).newInstance()
       val cpds = new ComboPooledDataSource(dsName)
       cpds.setDriverClass(driver)
-      cpds.setJdbcUrl(dbUrl)
+      cpds.setJdbcUrl(url)
+      cpds.setMaxPoolSize(20)
+      cpds.setMinPoolSize(2)
+      cpds.setInitialPoolSize(2)
+      cpds.setMaxIdleTime(30)
       cpds
-      }
   }
 
+  private def externalPool(): Option[DataSource] = {
+    import javax.naming.{ InitialContext, Context }
+    import scala.util.{ Try, Success }
 
-  //private var pool: Option[ComboPooledDataSource] = None
-  var dbpool: Option[ComboPooledDataSource] = None
+    val initContext = new InitialContext()
+    Try { initContext.lookup("java:/comp/env/jdbc/primesui") } match {
+      case Success(ds: DataSource) => Some(ds)
+      case _                       => None
+    }
+  }
+  
+
+  // small hack mandatory in order to close the internal pool when the application is undeployed
+  var dbpool:Option[DataSource] = None
+  var dbpoolShutdDownHook: Option[{def close():Unit}]=None
 
   protected def dbSetup() = {
-    Class.forName(driver).newInstance()
-    val cpds = viaUrlPoolBuild() getOrElse classicPoolBuild()
-    cpds.setMaxPoolSize(20)
-    cpds.setMinPoolSize(2)
-    cpds.setInitialPoolSize(2)
-    cpds.setMaxIdleTime(30)
+    val cpds:DataSource = {
+      externalPool() getOrElse {
+        val internal = internalViaUrlPoolBuild() getOrElse internalClassicPoolBuild()
+        dbpoolShutdDownHook = Some(internal)
+        internal
+      }
+    }
 
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
     SessionFactory.concreteFactory = Some(() => connection)
@@ -201,14 +217,14 @@ trait PrimesDBInit {
         PrimesDB.create
       }
     } catch {
-      case e:Exception => // Probably already created - TODO enhanhcements required
+      case e:Exception => // Probably already created - TODO enhancements required
     }
     dbpool = Some(cpds)
   }
 
   protected def dbTeardown() {
-    dbpool.foreach(_.close)
-    dbpool = None
+    dbpoolShutdDownHook.foreach(_.close)
+    dbpool=None
   }
 
 }

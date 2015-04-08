@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Context 
+   path="/primesui"
+   docBase="/primesui"
+   crossContext="true"
+   reloadable="true"
+   debug="1">
+
+   <ResourceLink name="jdbc/primesui"
+                 global="jdbc/primesui"
+                 type="javax.sql.DataSource"/>
+
+</Context>
+

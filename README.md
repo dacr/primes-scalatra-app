@@ -49,9 +49,12 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    on the home page 'current user homepage hit count=x'
    If not set, the default is false.
 
- * To specify a remote database, you can either use :
-   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** java system properties
-   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** environment variables
+ * To specify a remote database using an externally defined data source :
+   - Define a data source linked to "jdbc/primesui" jndi name.
+   - any available external data source is used in priority over the default internal data source (C3P0 based) 
+   
+ * To specify a remote database using the internal jdbc pool, you can either use :
+   - **PRIMES_DB_HOST**, **PRIMES_DB_PORT** and **PRIMES_DB_NAME** java system properties OR environment variables
    - If not set, primesui will try to use, either : 
      - **OPENSHIFT_MYSQL_DB_HOST** and **OPENSHIFT_MYSQL_DB_PORT** environment variables (when used with Redhat openshift systems)
      - **RDS_HOSTNAME**, **RDS_PORT**, **RDS_USERNAME**, **RDS_PASSWORD** and **RDS_DB_NAME** environment variables (when used with AWS systems)
