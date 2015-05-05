@@ -35,8 +35,8 @@
     <cache
         name="CountersCache"
         maxEntriesLocalHeap="10"
-        timeToIdleSeconds="60"
-        timeToLiveSeconds="900"
+        timeToIdleSeconds="10"
+        timeToLiveSeconds="30"
         statistics="true"
         />
 
@@ -44,8 +44,8 @@
     <cache
         name="LastCache"
         maxEntriesLocalHeap="10"
-        timeToIdleSeconds="60"
-        timeToLiveSeconds="900"
+        timeToIdleSeconds="10"
+        timeToLiveSeconds="30"
         statistics="true"
         />
 
