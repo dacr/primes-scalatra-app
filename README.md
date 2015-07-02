@@ -62,4 +62,4 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    - defaults are : localhost, 3306 for the port, and primes for the database name
 
 
-
+test
