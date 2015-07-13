@@ -18,6 +18,9 @@ object PrimesscalatraappBuild extends Build {
       name := Name,
       version := Version,
       scalaVersion := ScalaVersion,
+      artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
+        artifact.name + "." + artifact.extension
+	},
       resolvers += Classpaths.typesafeReleases,
       resolvers += "sonatype repository" at "https://oss.sonatype.org/content/repositories/releases/",
       resolvers += "JAnalyse Repository" at "http://www.janalyse.fr/repository/",
