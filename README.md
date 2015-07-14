@@ -61,5 +61,3 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
      - **DOCKER_PRIMES_DB_PORT_\d+_TCP_ADDR**, **DOCKER_PRIMES_DB_PORT_\d+_TCP_PORT** environment variables (when used with DOCKER systems)
    - defaults are : localhost, 3306 for the port, and primes for the database name
 
-
-test

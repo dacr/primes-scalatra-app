@@ -29,7 +29,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     <html>
       <body>
         <h1><a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a> is ready.</h1>
-    <p style="color:red"><b><i>classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
+    <p style="color:red"><b><i>Classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
     </p>
 
         The database cache contains <b>{ engine.valuesCount }</b>
