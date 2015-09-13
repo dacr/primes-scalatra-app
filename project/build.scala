@@ -31,11 +31,11 @@ object PrimesscalatraappBuild extends Build {
         "fr.janalyse" %% "primes" % "1.2.1",
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
-        "com.mchange" % "c3p0" % "0.9.5",
-        "net.sf.ehcache" % "ehcache-core" % "2.6.10",
+        "com.mchange" % "c3p0" % "0.9.5.1",
+        "net.sf.ehcache" % "ehcache-core" % "2.6.11",
         "javax.transaction" % "jta" % "1.1", // required for ehcache
-        "mysql" % "mysql-connector-java" % "5.1.34",
-        "ch.qos.logback" % "logback-classic" % "1.1.2" % "runtime",
+        "mysql" % "mysql-connector-java" % "5.1.36",
+        "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.16.v20140903" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet.jsp" % "2.2.0.v201112011158" % "container;provided;test",
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))

@@ -1,4 +1,17 @@
 
+# 0.1.3-SNAPSHOT
+
+ * updates :
+   - scalatra 2.3.1
+   - sbt 0.13.9
+   - ehcache-core 2.6.11
+   - c3p0 0.9.5.1
+   - mysql-connector-java 5.1.36
+   - scala 2.11.7
+   - logback-classic 1.1.3
+ * logs added
+
+
 # 0.1.2 (2015-04-08)
 
  * Externally data source defined support added, through "jdbc/primesui" jndi name

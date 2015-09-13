@@ -22,20 +22,25 @@ object PrimesEngine {
 }
 
 class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
+  val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
   private val oname = s"primes:name=PrimesEngine"
 
   def setup() {
+    logger.info("PrimesEngine is starting")
     JMX.register(this, oname)
     CacheManager.create()
     val manager = CacheManager.newInstance();
     val mBeanServer = ManagementFactory.getPlatformMBeanServer();
     ManagementService.registerMBeans(manager, mBeanServer, true, true, true, true);
+    logger.info("PrimesEngine started")
   }
 
   def teardown() {
+    logger.info("PrimesEngine is stopping")
     JMX.unregister(oname)
     CacheManager.getInstance().shutdown()
+    logger.info("PrimesEngine stopped")
   }
 
   def toBoolean(in:String):Boolean = {

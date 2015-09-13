@@ -119,6 +119,7 @@ object PrimesDBInit {
 
 trait PrimesDBInit {
   import util.Properties._
+  private val logger = org.slf4j.LoggerFactory.getLogger("fr.janalyse.primesui.PrimesDBInit")
 
   def env = System.getenv.toMap
   def renvOrNone(re:String):Option[String] = {
@@ -202,6 +203,7 @@ trait PrimesDBInit {
   var dbpoolShutdDownHook: Option[{def close():Unit}]=None
 
   protected def dbSetup() = {
+    logger.info("Application database setup")
     val cpds:DataSource = {
       externalPool() getOrElse {
         val internal = internalViaUrlPoolBuild() getOrElse internalClassicPoolBuild()
@@ -215,14 +217,17 @@ trait PrimesDBInit {
     try {
       transaction {
         PrimesDB.create
+        logger.info("Database created")
       }
     } catch {
       case e:Exception => // Probably already created - TODO enhancements required
+        logger.warn(s"Couldn't created the database (${e.getClass.getName} - ${e.getMessage})")
     }
     dbpool = Some(cpds)
   }
 
   protected def dbTeardown() {
+    logger.info("Application database cleanup")
     dbpoolShutdDownHook.foreach(_.close)
     dbpool=None
   }
