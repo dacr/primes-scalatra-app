@@ -11,6 +11,7 @@ import net.sf.ehcache.management.ManagementService
 import net.sf.ehcache.Element
 import net.sf.ehcache.Cache
 import fr.janalyse.jmx._
+import org.slf4j.LoggerFactory
 
 trait PrimesEngineMBean {
   def isUseCache(): Boolean
@@ -22,37 +23,42 @@ object PrimesEngine {
 }
 
 class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
+  private val logger = LoggerFactory.getLogger(getClass)
 
   private val oname = s"primes:name=PrimesEngine"
 
   def setup() {
+    logger.info("PrimesEngine is starting")
     JMX.register(this, oname)
     CacheManager.create()
     val manager = CacheManager.newInstance();
     val mBeanServer = ManagementFactory.getPlatformMBeanServer();
     ManagementService.registerMBeans(manager, mBeanServer, true, true, true, true);
+    logger.info("PrimesEngine started")
   }
 
   def teardown() {
+    logger.info("PrimesEngine is stopping")
     JMX.unregister(oname)
     CacheManager.getInstance().shutdown()
+    logger.info("PrimesEngine stopped")
   }
 
-  def toBoolean(in:String):Boolean = {
+  def toBoolean(in: String): Boolean = {
     in.toLowerCase().trim match {
-      case "true"|"1"|"on"|"yes"|"enabled"|"up" => true
+      case "true" | "1" | "on" | "yes" | "enabled" | "up" => true
       case _ => false
     }
   }
-  
-  private def provOrEnvOrDefault(key:String, default:Boolean):Boolean = {
+
+  private def provOrEnvOrDefault(key: String, default: Boolean): Boolean = {
     import scala.util.Properties._
     propOrNone(key)
       .orElse(envOrNone(key))
       .map(toBoolean)
-      .getOrElse(default)    
+      .getOrElse(default)
   }
-  
+
   val useTesting = provOrEnvOrDefault("PRIMESUI_TESTING", true)
   val useSession = provOrEnvOrDefault("PRIMESUI_SESSION", true)
   private var useCaches = provOrEnvOrDefault("PRIMESUI_CACHE", false)
@@ -68,24 +74,32 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   private lazy val factorsCache = cache.getCache("FactorsCache")
   private lazy val ulamCache = cache.getCache("UlamCache")
 
-  private def populatePrimesIfRequired(upTo: Long = 100000, grouped:Int = 1000) = {
+  private def populatePrimesIfRequired(upTo: Long = 100000, grouped: Int = 1000) = {
+    logger.info("populate primes if required")
     val pgen = new PrimesGenerator[Long]
     val fall = Future {
+      val started = System.currentTimeMillis()
+      val logger = LoggerFactory.getLogger("fr.janalyse.primesui.PrimesEngine.PopulateFuture")
+      logger.info(s"Asynchronous primes populate process started - SQL insertion are grouped by $grouped")
       var resumedStream = transaction {
         pgen.checkedValues(dbLastPrime.map(conv), dbLastNotPrime.map(conv))
       }
+      var counter:Long=0L
       while (resumedStream.head.value <= upTo) {
         transaction {
-	  (1 to grouped) foreach { _ => 
-	     dbAddValue(conv(resumedStream.head)) 
-             resumedStream = resumedStream.tail
-	  }
-	}
+          (1 to grouped) foreach { _ =>
+            dbAddValue(conv(resumedStream.head))
+            resumedStream = resumedStream.tail
+          }
+        }
+        counter+=grouped
       }
+      val secs=(System.currentTimeMillis()-started)/1000
+      logger.info(s"Done in $secs seconds - $counter values inserted into the database")
       'done
     }
     fall.onFailure {
-      case x => println(s"NOK - ${x.getMessage()} - add indexes on values collection")
+      case x => logger.error(s"Something wrong happens during values insertion into the database", x)
     }
     fall
   }
@@ -145,7 +159,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
     usingcache(transaction { dbCheck(num).map(conv) }, num, cachedValuesCache)
   }
 
-  private def using[R, T <% { def close(): Unit }](make: => T)(proc: T => R):R = {
+  private def using[R, T <% { def close(): Unit }](make: => T)(proc: T => R): R = {
     var xopt: Option[T] = None
     try {
       xopt = Option(make)
