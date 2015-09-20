@@ -1,6 +1,7 @@
 package fr.janalyse.primesui
 
 import org.scalatra._
+import org.scalatra.scalate._
 import javax.sql.DataSource
 import javax.naming.InitialContext
 import com.mchange.v2.c3p0.ComboPooledDataSource
@@ -10,7 +11,7 @@ import org.squeryl.adapters.MySQLAdapter
 import javax.servlet.ServletRequest
 
 
-class PrimesServlet extends PrimesscalatraappStack {
+class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
   implicit class PrimesEngineRequest( request : ServletRequest ) {
     def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
@@ -24,6 +25,10 @@ class PrimesServlet extends PrimesscalatraappStack {
       response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
   }
 
+  get("/essai") {
+    
+  }
+  
   get("/") {
     val engine = request.engine
     <html>
