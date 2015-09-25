@@ -2,6 +2,8 @@ import sbt._
 import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
+import com.mojolly.scalate.ScalatePlugin._
+import ScalateKeys._
 
 object PrimesscalatraappBuild extends Build {
   val Organization = "fr.janalyse"
@@ -10,7 +12,7 @@ object PrimesscalatraappBuild extends Build {
   val ScalaVersion = "2.11.7"
   val ScalatraVersion = "2.3.1"
 
-  lazy val project = Project (
+  lazy val project = Project(
     "primes-scalatra-app",
     file("."),
     settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ /*scalateSettings ++ */ Seq(
@@ -20,12 +22,13 @@ object PrimesscalatraappBuild extends Build {
       scalaVersion := ScalaVersion,
       artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
         artifact.name + "." + artifact.extension
-	},
+      },
       resolvers += Classpaths.typesafeReleases,
       resolvers += "sonatype repository" at "https://oss.sonatype.org/content/repositories/releases/",
       resolvers += "JAnalyse Repository" at "http://www.janalyse.fr/repository/",
       libraryDependencies ++= Seq(
         "org.scalatra" %% "scalatra" % ScalatraVersion,
+        "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
         "fr.janalyse" %% "primes" % "1.2.1",
@@ -38,14 +41,20 @@ object PrimesscalatraappBuild extends Build {
         "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.16.v20140903" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet.jsp" % "2.2.0.v201112011158" % "container;provided;test",
-        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))
-      ).map(
+        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar")))
+        /*.map(
           _.exclude("org.scala-lang", "scala-compiler")
-           .exclude("org.scala-lang", "scala-reflect")
-           .exclude("com.typesafe.akka", "akka-actor_2.11")
-	         .exclude("org.scala-lang", "jline")
-            )
-      
-    )
-  )
+            .exclude("org.scala-lang", "scala-reflect")
+            .exclude("com.typesafe.akka", "akka-actor_2.11")
+            .exclude("org.scala-lang", "jline")
+            )*/
+            ,
+      scalateTemplateConfig in Compile <<= (sourceDirectory in Compile) { base =>
+        Seq(
+          TemplateConfig(
+            base / "webapp" / "WEB-INF" / "templates",
+            Seq.empty, /* default imports should be added here */
+            Seq.empty, /* add extra bindings here */
+            Some("templates")))
+      }))
 }

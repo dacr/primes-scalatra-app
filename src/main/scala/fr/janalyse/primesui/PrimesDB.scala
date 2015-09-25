@@ -130,7 +130,7 @@ trait PrimesDBInit {
     val dbHost = None
       .orElse(propOrNone("PRIMES_DB_HOST"))
       .orElse(envOrNone("PRIMES_DB_HOST"))
-      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))
+      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))                 // OPENSHIFT
       .orElse(propOrNone("RDS_HOSTNAME"))                           // AMAZON AWS
       .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_ADDR""")) // DOCKER
       .getOrElse("localhost")
@@ -138,7 +138,7 @@ trait PrimesDBInit {
     val dbPort = None
       .orElse(propOrNone("PRIMES_DB_PORT"))
       .orElse(envOrNone("PRIMES_DB_PORT"))
-      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_PORT"))
+      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_PORT"))                 // OPENSHIFT
       .orElse(propOrNone("RDS_PORT"))                               // AMAZON AWS
       .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_PORT""")) // DOCKER
       .getOrElse("3306").toInt
@@ -169,7 +169,9 @@ trait PrimesDBInit {
 
   
   private def internalViaUrlPoolBuild():Option[ComboPooledDataSource] = {
-    for { dbUrl <- propOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0) } yield makeInternalDataSource(dbUrl)
+    for {
+      dbUrl <- propOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0)
+      } yield makeInternalDataSource(dbUrl)
   }
   
   private def makeInternalDataSource(url:String):ComboPooledDataSource = {

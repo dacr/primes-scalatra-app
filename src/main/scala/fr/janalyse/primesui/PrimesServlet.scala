@@ -1,6 +1,7 @@
 package fr.janalyse.primesui
 
 import org.scalatra._
+import org.scalatra.scalate._
 import javax.sql.DataSource
 import javax.naming.InitialContext
 import com.mchange.v2.c3p0.ComboPooledDataSource
@@ -10,7 +11,7 @@ import org.squeryl.adapters.MySQLAdapter
 import javax.servlet.ServletRequest
 
 
-class PrimesServlet extends PrimesscalatraappStack {
+class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
   implicit class PrimesEngineRequest( request : ServletRequest ) {
     def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
@@ -24,9 +25,18 @@ class PrimesServlet extends PrimesscalatraappStack {
       response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
   }
 
+  get("/essai") {
+    contentType="text/html"
+    scaml("essai", "x"->2)
+  }
+  
   get("/") {
     val engine = request.engine
     <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link href="css/bootstrap.min.css" rel="stylesheet"/>
+      </head>
       <body>
         <h1><a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a> is ready.</h1>
     <p style="color:red"><b><i>Classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
