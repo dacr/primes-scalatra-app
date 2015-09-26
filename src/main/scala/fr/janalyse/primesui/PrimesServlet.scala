@@ -27,7 +27,16 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
   get("/essai") {
     contentType="text/html"
-    scaml("essai", "x"->2)
+    scaml(
+      "essai",
+      "engine"->request.engine,
+      "checkUrl"->url("/check"),
+      "factorsUrl"->url("/factors"),
+      "primeUrl"->url("/prime"),
+      "primesUrl"->url("/primes"),
+      "populateUrl"->url("/populate"),
+      "ulamUrl"->url("/ulam")
+    )
   }
   
   get("/") {
@@ -38,7 +47,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
         <link href="css/bootstrap.min.css" rel="stylesheet"/>
       </head>
       <body>
-        <h1><a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a> is ready.</h1>
+        <h1><img src="images/logo.png"/><a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a> is ready.</h1>
     <p style="color:red"><b><i>Classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
     </p>
 
@@ -121,9 +130,8 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
      </a>
 
   
-  get("/check/:num") {
+  def check(num:Long) = {
     val engine = request.engine
-    val num = params("num").toLong
     val value = engine.check(num)
     val isPrime = value.map(_.isPrime).getOrElse(false)
     <html>
@@ -134,22 +142,15 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
     </html>
   }
   
-  get("/check") {
-    val engine = request.engine
-    val num = nextInt
-    val value = engine.check(num)
-    val isPrime = value.map(_.isPrime).getOrElse(false)
-    <html>
-      <body>
-        <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
-        <p>
-          <i><a href={url("/check")}>Again</a></i> -
-          <i>{gotoMenu}</i>
-        </p>
-      </body>
-    </html>
+  get("/check/:num") {
+    val num = params("num").toLong
+    check(num)
   }
-
+  get("/check") {
+    check(nextInt)
+  }
+  
+  
   private def forTestingOnly(proc: => xml.NodeSeq):xml.NodeSeq = {
     if (request.engine.useTesting) proc else {
       <html>
@@ -257,19 +258,28 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
     leakedcheck(nextInt)
   }
   
-  get("/prime/:nth") {
+  
+  def prime(nth:Long) = {
     val engine = request.engine
-    val nth = params("nth").toLong
     val checked = engine.getPrime(nth).get // TODO : DANGEROUS
-    import checked._
     <html>
       <body>
-        <h1>{ value } is the { nth }th prime</h1>
+        <h1>{ checked.value } is the { checked.nth }th prime</h1>
         <p><i>{gotoMenu}</i></p>
       </body>
-    </html>
+    </html>    
   }
-
+  
+  get("/prime/:nth") {
+    val nth = params("nth").toLong
+    prime(nth)
+  }
+  
+  get("/prime") {
+    prime(nextInt)
+  }
+  
+  
   def primes(below:Long, above:Long=0L) = {
     val engine = request.engine
     val primes = engine.listPrimes(below, above)
