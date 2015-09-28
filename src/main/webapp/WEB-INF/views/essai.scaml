@@ -1,8 +1,89 @@
--@ val x: Integer
+-@ import val engine: fr.janalyse.primesui.PrimesEngine
+-@ val checkUrl: String
+-@ val factorsUrl:String
+-@ val primeUrl:String
+-@ val primesUrl:String
+-@ val populateUrl:String
+-@ val ulamUrl:String
 
 %h1
-  Some test
+  %img(src = "images/logo.png")
+  %a(href = "https://github.com/dacr/primes-scalatra-app") Primes web application
+  is ready
+
+%p(style = "color:red")
+  %i
+    Classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.
 
 %p
-  Result is 
-  = 1+1+x
+  The database cache contains 
+  %b#valuesCount
+    #{valuesCount}
+  already checked values, with
+  %b#primesCount
+    #{primesCount}
+  primes found.
+  The highest found prime is 
+  %b#lastPrime
+    #{ lastPrime.map(_.value).getOrElse(-1) }.
+  The application cache is 
+  %b#cacheStatus
+    #{if (isUseCache) "enabled" else "disabled"}.
+
+
+%h2 API
+
+%ul
+
+  %li
+    %b
+      %a(href = checkUrl)>< check/
+    %code>< $num
+    \: Test if <code>$num</code> is a prime number or not
+    
+  %li
+    %b 
+      %a(href=primeUrl)>< prime/
+    %code>< $nth
+    \: Get the <code>$nth</code> prime
+    
+  %li
+    %b
+      %a(href=factorsUrl)>< factors/
+    %code>< $num
+    \: Get the prime factors of <code>$num</code>
+
+  %li
+    %b
+      %a(href={primesUrl+"/1000"})>< primes/
+    %code>< $below
+    \: List primes lower than <code>$below</code>.
+    List up to
+    - for (n <-List(1,25,50,100))
+      %a(href={primesUrl+"/"+(n*1000)})=n.toString()+"K"
+
+  %li
+    %b
+      %a(href={primesUrl+"/"+140+"/"+100})>< primes/
+    %code>< $below
+    \/
+    %code>< $above
+    \: List primes which are lower than <code>$below</code> and greater than <code>$above</code>
+  
+  %li
+    %b
+      %a(href={populateUrl+"/25000"})>< populate/
+    %code>< $upTo
+    \: Populate the database up to the specified value. Take care it calls a synchronized method.
+    - for (n <-List(1,25,50,100,250,500))
+      %a(href={populateUrl+"/"+(n*1000)})=n.toString()+"K"
+  
+  %li
+    %b
+      %a(href={ulamUrl+"/"+128})>< ulam/
+    %code>< $size
+    \: Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation.
+    - for (n <-List(128,256,512,1024))
+      %a(href={ulamUrl+"/"+n})=n.toString()
+
+      
