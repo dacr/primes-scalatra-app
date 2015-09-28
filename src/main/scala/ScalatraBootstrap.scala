@@ -8,11 +8,15 @@ class ScalatraBootstrap extends LifeCycle with PrimesDBInit {
   override def init(context: ServletContext) {
     logger.info("primesui is starting")
     dbSetup()
-    context.mount(new PrimesServlet, "/*")
+    
     val pe = new PrimesEngine()
     pe.setup()
+    
+    context.mount(new PrimesServlet, "/*")
+
     context.setAttribute(PrimesEngine.KEY, pe)
     context.setAttribute(PrimesDBInit.KEY, dbpool)
+
     logger.info("primesui started")
   }
 

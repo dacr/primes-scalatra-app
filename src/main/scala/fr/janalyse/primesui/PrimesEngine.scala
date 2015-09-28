@@ -27,7 +27,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
 
   private val oname = s"primes:name=PrimesEngine"
 
-  def setup() {
+  def setup() = {
     logger.info("PrimesEngine is starting")
     JMX.register(this, oname)
     CacheManager.create()
@@ -35,6 +35,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
     val mBeanServer = ManagementFactory.getPlatformMBeanServer();
     ManagementService.registerMBeans(manager, mBeanServer, true, true, true, true);
     logger.info("PrimesEngine started")
+    this
   }
 
   def teardown() {
