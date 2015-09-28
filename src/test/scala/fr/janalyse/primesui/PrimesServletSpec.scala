@@ -7,23 +7,25 @@ import org.scalatra.test.specs2._
 class PrimesServletSpec extends MutableScalatraSpec {
 
   val he = addServlet(classOf[PrimesServlet], "/*")
-
-  val pe = new PrimesEngine().setup()
-  val db = new PrimesDBInit{dbSetup()}
   
-  val ctx = he.getServlet.getServletConfig.getServletContext
-  ctx.setAttribute(PrimesEngine.KEY, pe)
-  ctx.setAttribute(PrimesDBInit.KEY, db.dbpool)
-  
+  override lazy val servletContextHandler = {
+    import org.eclipse.jetty.servlet._
+    val handler = new ServletContextHandler(ServletContextHandler.SESSIONS)
+    handler.setContextPath(contextPath)
+    handler.addEventListener(new org.scalatra.servlet.ScalatraListener)
+    handler.setResourceBase(resourceBasePath)
+    handler
+  }
   
   "GET / on PrimesServlet" should {
     "return status 200" in {
       get("/") {
-        Thread.sleep(300 * 1000L)
         status must_== 200
       }
     }
-
   }
+  
+  
+  
 }
 
