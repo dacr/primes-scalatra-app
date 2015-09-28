@@ -5,6 +5,15 @@
 -@ val primesUrl:String
 -@ val populateUrl:String
 -@ val ulamUrl:String
+-@ val slowcheckUrl:String
+-@ val slowsqlUrl:String
+-@ val leakedcheckUrl:String
+-@ val bigUrl:String
+-@ val aliveUrl:String
+-@ val sysinfoUrl:String
+-@ val configUrl:String
+-@ val count:Option[Long]
+-@ val version:String
 
 %h1
   %img(src = "images/logo.png")
@@ -31,7 +40,8 @@
     #{if (isUseCache) "enabled" else "disabled"}.
 
 
-%h2 API
+-#---------------------------------------------------------------------------------------------
+%h2 Features
 
 %ul
 
@@ -86,6 +96,73 @@
     - for (n <-List(128,256,512,1024))
       %a(href={ulamUrl+"/"+n})=n.toString()
 
-%h2 Experiments
+-#---------------------------------------------------------------------------------------------
+%h2 For experiments
 
+%ul
+
+  %li
+    %b
+      %a(href={slowcheckUrl+"/"+123+"/"+5})>< slowcheck/
+    %code>< $num
+    \/
+    %code>< $secs 
+    \: to test if <code>$num</code> is a prime number or not,
+    and wait <code>$secs</code> seconds at server side, this is
+    for test purposes, default is 1 second.
+
+  %li
+    %b
+      %a(href={slowsqlUrl+"/"+123+"/"+5})>< slowsql/
+    %code $num
+    \/
+    %code $secs
+    \: to test if <code>$num</code> is a prime number or not, and
+    wait <code>$secs</code> seconds inside the database, this is for
+    test purposes, default is 1 second, <b>cache feature is never used</b>.
+
+  %li
+    %b
+      %a(href={leakedcheckUrl+"/"+123+"/"+1})>< leakedcheck/
+    %code $num
+    \/
+    %code $howmany
+    \: to test if <code>$num</code> is a prime number or not, and
+    leak <code>$howmany</code> megabytes at server side, this is for
+    test purposes, default is 1Mb.
+
+  %li
+    %b
+      %a(href={bigUrl})>< big/
+    %code $howmanyKB
+    \: to test a response with an approximative size
+    of <code>$howmany</code> kilobytes, default is 3Mb.
+
+
+-#---------------------------------------------------------------------------------------------
 %h2 Admin
+
+%ul
+  %li
+    %b
+      %a(href=aliveUrl)>< alive
+    \: Life page test
+    
+  %li
+    %b
+      %a(href=sysinfoUrl)>< sysinfo
+    \: System information
+    
+  %li
+    %b
+      %a(href=configUrl)>< config
+    \: Application configuration
+
+%p
+  Primesui release 
+  %span#version=version
+  %br>
+  - for {n <- count }
+    %i#count
+      Current user homepage hit count 
+      %span#count=n

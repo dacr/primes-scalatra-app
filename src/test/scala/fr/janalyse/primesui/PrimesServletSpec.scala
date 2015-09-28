@@ -17,6 +17,7 @@ class PrimesServletSpec extends MutableScalatraSpec {
     handler
   }
   
+  
   "GET / on PrimesServlet" should {
     "return status 200" in {
       get("/") {
@@ -26,6 +27,25 @@ class PrimesServletSpec extends MutableScalatraSpec {
   }
   
   
+  "GET /check/123 on PrimesServlet" should {
+    "return status 200" in {
+      get("/check/123") {
+        status must_== 200
+        body must contain("not prime")
+      }
+    }
+  }
+
+  
+  "GET /check/17 on PrimesServlet" should {
+    "return status 200" in {
+      get("/check/17") {
+        status must_== 200
+        body must not contain("not prime")
+      }
+    }
+  }
+
   
 }
 

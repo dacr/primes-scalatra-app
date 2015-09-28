@@ -25,97 +25,38 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
       response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
   }
 
-  get("/essai") {
+  get("/") {
     contentType="text/html"
+    val count = if (!request.engine.useSession) None else {
+      val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
+        case None => 1L
+        case Some(count) => count+1
+      }
+      request.getSession.setAttribute("count", newcount)
+      Some(newcount)
+    }
+
     scaml(
-      "essai",
+      "index",
       "engine"->request.engine,
       "checkUrl"->url("/check"),
       "factorsUrl"->url("/factors"),
       "primeUrl"->url("/prime"),
       "primesUrl"->url("/primes"),
       "populateUrl"->url("/populate"),
-      "ulamUrl"->url("/ulam")
+      "ulamUrl"->url("/ulam"),
+      "slowcheckUrl"->url("/slowcheck"),
+      "slowsqlUrl"->url("/slowsql"),
+      "leakedcheckUrl"->url("/leakedcheck"),
+      "bigUrl"->url("/big"),
+      "aliveUrl"->url("/alive"),
+      "sysinfoUrl"->url("/sysinfo"),
+      "configUrl"->url("/config"),
+      "count"->count,
+      "version"->MetaInfo.version
     )
   }
   
-  get("/") {
-    val engine = request.engine
-    <html>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <link href="css/bootstrap.min.css" rel="stylesheet"/>
-      </head>
-      <body>
-        <h1><img src="images/logo.png"/><a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a> is ready.</h1>
-    <p style="color:red"><b><i>Classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.</i></b>
-    </p>
-
-        The database cache contains <b>{ engine.valuesCount }</b>
-        already checked values, with <b>{ engine.primesCount }</b>
-        primes found.
-        The highest found prime is <b>{ engine.lastPrime.map(_.value).getOrElse(-1) }</b>.
-        The application cache is <b>{if (engine.isUseCache) "enabled" else "disabled"}</b>.
-        <h2>API</h2>
-        <ul>
-          <li><b>check/</b><i>$num</i> : to test if <i>$num</i> is a prime number or not.
-                check a <a href={url("/check")}>random value</a>.
-          </li>
-          <li><b>prime/</b><i>$nth</i> : to get the nth prime, 1 -> 2, 2->3, 3->5, 4->7</li>
-          <li><b>factors/</b><i>$num</i> : to get the prime factors of <i>$num</i>.
-                Factorize a <a href={url("/factors")}>random value</a>.
-          </li>
-          <li><b>primes/</b><i>$below</i> : list primes lower than <i>$below</i>. List up to 
-             <a href={url("/primes/1000")}>1K</a>,
-             <a href={url("/primes/25000")}>25K</a>,
-             <a href={url("/primes/50000")}>50K</a>,
-             <a href={url("/primes/100000")}>100K</a>
-          </li>
-          <li><b>primes/</b><i>$below</i>/<i>$above</i> : list primes which are lower than <i>$below</i> and greater than <i>$above</i></li>
-          <li><b>populate/</b><i>$upTo</i> : populate the database up to the specified value. Take care it calls a synchronized method.
-            Populate up to 
-             <a href={url("/populate/10000")}>10K</a>,
-             <a href={url("/populate/25000")}>25K</a>,
-             <a href={url("/populate/50000")}>50K</a>,
-             <a href={url("/populate/100000")}>100K</a>,
-             <a href={url("/populate/250000")}>250K</a>,
-             <a href={url("/populate/500000")}>500K</a>
-          </li>
-          <li><b>ulam/</b><i>$size</i> : Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation.
-            Example for various size :
-              <a href={url("/ulam/128")}>128</a>, 
-              <a href={url("/ulam/256")}>256</a>, 
-              <a href={url("/ulam/512")}>512</a>,
-              <a href={url("/ulam/1024")}>1024</a> 
-          </li>
-
-        </ul>
-        <h2>For testing purposes...</h2>
-          <ul>
-            <li><b>slowcheck/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds at server side, this is for test purposes, default is 1 second.</li>
-            <li><b>slowsql/</b><i>$num</i>/<i>$secs</i> : to test if <i>$num</i> is a prime number or not, and wait <i>$secs</i> seconds inside the database, this is for test purposes, default is 1 second, <b>cache feature is not used</b>.</li>
-            <li><b>leakedcheck/</b><i>$num</i>/<i>$howmany</i> : to test if <i>$num</i> is a prime number or not, and leak <i>$howmany</i> megabytes at server side, this is for test purposes, default is 1Mb.</li>
-            <li><b>big/</b><i></i>$howmanyKB : to test a response with an approximative size of <i>$howmany</i> kilobytes, default is 3Mb.</li>
-          </ul>
-        <h2>Admin</h2>
-        <ul>
-          <li><a href={url("/alive")}>Life page test</a></li>
-          <li><a href={url("/sysinfo")}>System information</a></li>
-          <li><a href={url("/config")}>Application configuration</a></li>
-        </ul>
-        {
-          if (!engine.useSession) xml.NodeSeq.Empty else {
-            val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
-              case None => 1L
-              case Some(count) => count+1
-            }
-            request.getSession.setAttribute("count", newcount)
-            <p><i>current user homepage hit count={newcount}</i></p>
-          }
-        }
-      </body>
-    </html>
-  }
 
   import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
   
@@ -124,30 +65,34 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 //       Back to the menu
 //     </a>
 
-  def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) =
-     <a href={url("/.", includeServletPath=false)}>
-       Back to the menu
-     </a>
+  
+  def again(url:Option[String])(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+     url.map(u => <i><a href={u}>Again</a></i>).toSeq
+  } 
+  
+  def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+     <i><a href={url("/.", includeServletPath=false)}>Back to the menu</a></i>
+  } 
 
   
-  def check(num:Long) = {
+  def check(num:Long, againUrl:Option[String]) = {
     val engine = request.engine
     val value = engine.check(num)
     val isPrime = value.map(_.isPrime).getOrElse(false)
     <html>
       <body>
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
-        <p><i>{gotoMenu}</i></p>
+        <p>{again(againUrl)} {gotoMenu}</p>
       </body>
     </html>
   }
   
   get("/check/:num") {
     val num = params("num").toLong
-    check(num)
+    check(num, None)
   }
   get("/check") {
-    check(nextInt)
+    check(nextInt, Some("/check"))
   }
   
   
@@ -156,7 +101,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
       <html>
         <body>
 	  <h1>Feature disabled...</h1>
-          <p><i>{gotoMenu}</i></p>
+          <p>{gotoMenu}</p>
 	</body>
       </html>
     }
@@ -174,7 +119,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
         this page simulates a slow server with a minimum response time of { secs }
         seconds
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
       </body>
     </html>
   }
@@ -205,7 +150,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
         this page simulates a slow database with a minimum response time of { secs }
         seconds
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
       </body>
     </html>
   }
@@ -238,7 +183,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
         <h1>{ num } is the { value.map(_.nth).getOrElse(-1) }th { if (isPrime) "" else "not" } prime</h1>
         this page simulates a memory leak, you've just lost { howmany } megabytes !
         seconds
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
       </body>
     </html>
   }
@@ -259,24 +204,24 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
   }
   
   
-  def prime(nth:Long) = {
+  def prime(nth:Long, againUrl:Option[String]) = {
     val engine = request.engine
     val checked = engine.getPrime(nth).get // TODO : DANGEROUS
     <html>
       <body>
         <h1>{ checked.value } is the { checked.nth }th prime</h1>
-        <p><i>{gotoMenu}</i></p>
+        <p>{again(againUrl)} {gotoMenu}</p>
       </body>
     </html>    
   }
   
   get("/prime/:nth") {
     val nth = params("nth").toLong
-    prime(nth)
+    prime(nth, None)
   }
   
   get("/prime") {
-    prime(nextInt)
+    prime(nextInt, Some("/prime"))
   }
   
   
@@ -293,7 +238,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 		   }
          }
          </ul>
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
       </body>
     </html>
   }
@@ -320,7 +265,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
           if (factors.isEmpty) <h1>{ num } = { num } <i>and is prime</i> </h1>
           else <h1>{ num } = { factors.mkString(" * ") }</h1>
         }
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
       </body>
     </html>
   }
@@ -337,7 +282,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
         }
         <p>
           <i><a href={url("/factors")}>Again</a></i> -
-          <i>{gotoMenu}</i>
+          {gotoMenu}
         </p>
       </body>
     </html>
@@ -358,7 +303,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
       <body>
         <h1>Primes generator state : { engine.populate(upto) }</h1>
         { msg.map { m => <p>WARN : { m }</p> }.getOrElse(xml.NodeSeq.Empty) }
-        <p><i>{ gotoMenu }</i></p>
+        <p>{ gotoMenu }</p>
       </body>
     </html>
 
@@ -392,7 +337,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
             }<br/>
             <input type="submit" value="Submit"/>
           </form>
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
         </body>
       </html>
     }
@@ -420,7 +365,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
     <p>1234567891234567891234567890123456789012345678901234567</p>
   }
 }
-        <p><i>{gotoMenu}</i></p>
+        <p>{gotoMenu}</p>
       </body>
     </html>
   }
