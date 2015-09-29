@@ -66,8 +66,8 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 //     </a>
 
   
-  def again(url:Option[String])(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-     url.map(u => <i><a href={u}>Again</a></i>).toSeq
+  def again(target:Option[String])(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+     target.map(u => <i><a href={url(u, includeServletPath=false)}>Again</a></i>).toSeq
   } 
   
   def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) = {
