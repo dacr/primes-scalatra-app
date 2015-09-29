@@ -13,6 +13,7 @@ import javax.servlet.ServletRequest
 
 class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
+  
   implicit class PrimesEngineRequest( request : ServletRequest ) {
     def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
     def dbpool : Option[DataSource] = request.getServletContext().getAttribute( PrimesDBInit.KEY ).asInstanceOf[Option[DataSource]]
@@ -22,11 +23,11 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
   def nextInt = synchronized {rnd.nextInt(10000)}
   
   before("*") {
-      response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
+    response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
+    
   }
 
   get("/") {
-    contentType="text/html"
     val count = if (!request.engine.useSession) None else {
       val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
         case None => 1L
@@ -36,6 +37,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
       Some(newcount)
     }
 
+    contentType="text/html"
     scaml(
       "index",
       "engine"->request.engine,
@@ -66,15 +68,21 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 //     </a>
 
   
-  def again(target:Option[String])(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-     target.map(u => <i><a href={url(u, includeServletPath=false)}>Again</a></i>).toSeq
-  } 
+  def gotoUrl(goto:Option[String])(implicit request: HttpServletRequest, response: HttpServletResponse) =
+    for {u <- goto } yield url(u, includeServletPath=false)
   
+  def again(target:Option[String])(implicit request: HttpServletRequest, response: HttpServletResponse) =
+    for { ref<- gotoUrl(target).toSeq} yield <i><a href={ref}>Again</a></i>
+  
+  
+  def homeUrl(implicit request: HttpServletRequest, response: HttpServletResponse) = {
+    url("/.", includeServletPath=false)
+  }
   def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-     <i><a href={url("/.", includeServletPath=false)}>Back to the menu</a></i>
+     <i><a href={homeUrl}>Back to the menu</a></i>
   } 
 
-  
+/*  
   def check(num:Long, againUrl:Option[String]) = {
     val engine = request.engine
     val value = engine.check(num)
@@ -86,7 +94,21 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
       </body>
     </html>
   }
-  
+*/
+  def check(num:Long, againUrl:Option[String]) = {
+    val engine = request.engine
+    val value = engine.check(num)
+    val isPrime = value.map(_.isPrime).getOrElse(false)
+    contentType="text/html"
+    scaml(
+      "check",
+      "num"->num,
+      "value"->value,
+      "againUrl"->gotoUrl(againUrl),
+      "homeUrl"->homeUrl
+      )
+  }
+
   get("/check/:num") {
     val num = params("num").toLong
     check(num, None)

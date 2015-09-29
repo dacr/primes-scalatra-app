@@ -62,7 +62,9 @@ object PrimesscalatraappBuild extends Build {
           TemplateConfig(
             base / "webapp" / "WEB-INF" / "templates",
             Seq.empty, /* default imports should be added here */
-            Seq.empty, /* add extra bindings here */
+            Seq(
+              Binding("context", "_root_.org.scalatra.scalate.ScalatraRenderContext", importMembers = true, isImplicit = true)
+            ),  /* add extra bindings here */
             Some("templates")))
       }))
 }
