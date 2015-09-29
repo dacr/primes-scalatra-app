@@ -22,7 +22,8 @@
 
 %p(style = "color:red")
   %i
-    Classic webapp / mysql release of primes ui web application, classical design, almost all operations are synchronous.
+    Classic webapp / mysql release of primes ui web application, classical design,
+    almost all operations are synchronous.
 
 %p
   The database cache contains 
@@ -84,7 +85,7 @@
     %b
       %a(href={populateUrl+"/25000"})>< populate/
     %code>< $upTo
-    \: Populate the database up to the specified value. Take care it calls a synchronized method.
+    \: Populate the database up to the specified value. It triggers a background thread.
     - for (n <-List(1,25,50,100,250,500))
       %a(href={populateUrl+"/"+(n*1000)})=n.toString()+"K"
   
@@ -92,7 +93,8 @@
     %b
       %a(href={ulamUrl+"/"+128})>< ulam/
     %code>< $size
-    \: Dynamically draw an ulam spiral with the give <i>$size</i>. Take care of your CPUs and Heap ; this is a server side computation.
+    \: Dynamically draw an ulam spiral with the give <i>$size</i>.
+    Take care of your CPUs and Heap, this is a server side computation.
     - for (n <-List(128,256,512,1024))
       %a(href={ulamUrl+"/"+n})=n.toString()
 
@@ -158,13 +160,15 @@
       %a(href=configUrl)>< config
     \: Application configuration
 
-%p
+%p(align="right")
   %a(href="https://github.com/dacr/primes-scalatra-app") PrimesUI
-  release 
-  %span#version=version
+  release
+  %b 
+    %span#version=version
   based on 
   %a(href="https://github.com/dacr/primes") Primes library
-  %span#pversion=primes.MetaInfo.version
+  %b
+    %span#pversion=primes.MetaInfo.version
   %br>
   - for {n <- count }
     %i#count
