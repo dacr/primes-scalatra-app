@@ -7,15 +7,16 @@ import ScalateKeys._
 
 object PrimesscalatraappBuild extends Build {
 
-  def propenvOrElse(key:String):Option[String] = {
+  def penvOrElse(key:String, alt:String):String = {
     import scala.util.Properties._
-    propOrNone(key).orElse(envOrNone(key))
+    propOrNone(key).orElse(envOrNone(key)).getOrElse(alt)
   }
 
-  val Organization = "fr.janalyse"
-  val Name = "primesui"
-  val Version = "0.1.3-SNAPSHOT"
-  val ScalaVersion = "2.11.7"
+  val Organization    = "fr.janalyse"
+  val Name            = "primesui"
+  val Version         = penvOrElse("PRIMESUI_REV", "0.1.3-SNAPSHOT")
+  val PrimesVersion   = penvOrElse("PRIMES_REV",   "1.2.2-SNAPSHOT")
+  val ScalaVersion    = "2.11.7"
   val ScalatraVersion = "2.3.1"
 
   lazy val project = Project(
@@ -38,7 +39,7 @@ object PrimesscalatraappBuild extends Build {
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
-        "fr.janalyse" %% "primes" % propenvOrElse("PRIMES_REV").getOrElse("1.2.2-SNAPSHOT"),
+        "fr.janalyse" %% "primes" % PrimesVersion,
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
         "com.mchange" % "c3p0" % "0.9.5.1",
