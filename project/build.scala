@@ -6,6 +6,12 @@ import com.mojolly.scalate.ScalatePlugin._
 import ScalateKeys._
 
 object PrimesscalatraappBuild extends Build {
+
+  def propenvOrElse(key:String):Option[String] = {
+    import scala.util.Properties._
+    propOrNone(key).orElse(envOrNone(key))
+  }
+
   val Organization = "fr.janalyse"
   val Name = "primesui"
   val Version = "0.1.3-SNAPSHOT"
@@ -32,7 +38,7 @@ object PrimesscalatraappBuild extends Build {
         "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
-        "fr.janalyse" %% "primes" % "1.2.2-SNAPSHOT",
+        "fr.janalyse" %% "primes" % propenvOrElse("PRIMES_REV").getOrElse("1.2.2-SNAPSHOT"),
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
         "com.mchange" % "c3p0" % "0.9.5.1",
