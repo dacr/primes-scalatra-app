@@ -1,0 +1,23 @@
+- import fr.janalyse.primes._
+-@ val num: Long
+-@ val value: Option[CheckedValue[Long]]
+-@ val againUrl : Option[String]
+-@ val homeUrl : String
+
+
+%h1
+  - value match
+    - case Some(CheckedValue(n, true, digits, nth)) =>
+      #{num} is the #{nth}th prime
+      
+    - case Some(CheckedValue(n, false, digits, nth)) =>
+      #{num} is the #{nth}th not prime
+      
+    - case None =>
+      #{num} is the -1 not prime
+
+%p
+  - for {ref <- againUrl }
+    %a(href=ref) Again
+    \-
+  %a(href=homeUrl) Back to the menu
