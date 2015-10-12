@@ -217,6 +217,7 @@ trait PrimesDBInit {
         internal
       }
     }
+    logger.info("Selected datasource classname : "+cpds.getClass.getName)
 
     def connection = Session.create(cpds.getConnection, new MySQLAdapter)
     SessionFactory.concreteFactory = Some(() => connection)
