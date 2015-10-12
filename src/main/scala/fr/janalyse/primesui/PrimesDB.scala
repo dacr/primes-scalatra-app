@@ -177,6 +177,7 @@ trait PrimesDBInit {
   private def makeInternalDataSource(url:String):ComboPooledDataSource = {
       val dsName = "primes-ds"
       val driver = "com.mysql.jdbc.Driver"
+      logger.info("Using built in internal datasource, C3P0 based")
       Class.forName(driver).newInstance()
       val cpds = new ComboPooledDataSource(dsName)
       cpds.setDriverClass(driver)
@@ -191,11 +192,14 @@ trait PrimesDBInit {
   private def externalPool(): Option[DataSource] = {
     import javax.naming.{ InitialContext, Context }
     import scala.util.{ Try, Success }
-
+    val name = "java:/comp/env/jdbc/primesui"
     val initContext = new InitialContext()
-    Try { initContext.lookup("java:/comp/env/jdbc/primesui") } match {
-      case Success(ds: DataSource) => Some(ds)
-      case _                       => None
+    Try { initContext.lookup(name) } match {
+      case Success(ds: DataSource) => 
+        logger.info(s"Found an external datasource named '$name' ")
+        Some(ds)
+      case _ => 
+        None
     }
   }
   
