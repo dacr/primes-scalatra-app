@@ -42,7 +42,8 @@ object PrimesscalatraappBuild extends Build {
         "fr.janalyse" %% "primes" % PrimesVersion,
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
-        "com.mchange" % "c3p0" % "0.9.5.1",
+        //"com.mchange" % "c3p0" % "0.9.5.1",
+        "com.mchange" % "c3p0" % "0.9.2.1",
         "net.sf.ehcache" % "ehcache-core" % "2.6.11",
         "javax.transaction" % "jta" % "1.1", // required for ehcache
         "mysql" % "mysql-connector-java" % "5.1.36",
