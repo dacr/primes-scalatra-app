@@ -23,7 +23,12 @@ object PrimesscalatraappBuild extends Build {
   lazy val project = Project(
     "primes-scalatra-app",
     file("."),
-    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ /*scalateSettings ++ */ Seq(
+    settings = 
+      Defaults.defaultSettings ++ 
+      //ScalatraPlugin.scalatraWithJRebel ++
+      ScalatraPlugin.scalatraSettings ++
+      scalateSettings ++
+      Seq(
       organization := Organization,
       name := Name,
       version := Version,
