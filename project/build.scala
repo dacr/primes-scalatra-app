@@ -17,7 +17,8 @@ object PrimesscalatraappBuild extends Build {
   val Version         = penvOrElse("PRIMESUI_REV", "0.1.19-SNAPSHOT")
   val PrimesVersion   = penvOrElse("PRIMES_REV",   "1.2.2-SNAPSHOT")
   val ScalaVersion    = "2.11.7"
-  val ScalatraVersion = "2.3.1"
+  //val ScalatraVersion = "2.3.1"
+  val ScalatraVersion = "2.4.0.RC3"
 
   lazy val project = Project(
     "primes-scalatra-app",
@@ -42,7 +43,7 @@ object PrimesscalatraappBuild extends Build {
         "fr.janalyse" %% "primes" % PrimesVersion,
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
-        //"com.mchange" % "c3p0" % "0.9.5.1",
+        //"com.mchange" % "c3p0" % "0.9.5.1", // problem with java7 it uses new java8 jdbc API => java.lang.NoClassDefFoundError: java/sql/SQLType
         "com.mchange" % "c3p0" % "0.9.2.1",
         "net.sf.ehcache" % "ehcache-core" % "2.6.11",
         "javax.transaction" % "jta" % "1.1", // required for ehcache

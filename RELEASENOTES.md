@@ -1,4 +1,18 @@
 
+# 0.1.19-SNAPSHOT
+ 
+ * scalatra 2.4.0-RC3
+ * c3p0 downgraded to 0.9.2.1 
+   - problem with java7 it uses new java8 jdbc API =>
+     java.lang.NoClassDefFoundError: java/sql/SQLType
+   - [issues/57](https://github.com/swaldman/c3p0/issues/57)
+ * scalatra scalate templates are now used
+   - scaml base templates
+   - isDevelopmentMode set to false
+ * twitter bootstrap is now used
+ * more logging added to improve admin operations
+
+
 # 0.1.3-SNAPSHOT
 
  * updates :

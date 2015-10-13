@@ -13,6 +13,7 @@ import javax.servlet.ServletRequest
 
 class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
+  override def isDevelopmentMode = false
   
   implicit class PrimesEngineRequest( request : ServletRequest ) {
     def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
