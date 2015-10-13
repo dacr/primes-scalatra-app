@@ -14,8 +14,7 @@ import javax.servlet.ServletRequest
 class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
   override def isDevelopmentMode = false
-  
-  
+
   /* wire up the precompiled templates */
   import org.fusesource.scalate.{ TemplateEngine, Binding }
   import org.fusesource.scalate.layout.DefaultLayoutStrategy
@@ -28,7 +27,7 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
     engine
   }
   /* end wiring up the precompiled templates */
-  
+
   import javax.servlet.http.HttpServletRequest
   import collection.mutable
   override protected def templateAttributes(implicit request: HttpServletRequest): mutable.Map[String, Any] = {
@@ -62,8 +61,27 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
     }
 
     contentType="text/html"
-    scaml(
-      "index",
+//    scaml(
+//      "/templates/views/index",
+//      "engine"->request.engine,
+//      "checkUrl"->url("/check"),
+//      "factorsUrl"->url("/factors"),
+//      "primeUrl"->url("/prime"),
+//      "primesUrl"->url("/primes"),
+//      "populateUrl"->url("/populate"),
+//      "ulamUrl"->url("/ulam"),
+//      "slowcheckUrl"->url("/slowcheck"),
+//      "slowsqlUrl"->url("/slowsql"),
+//      "leakedcheckUrl"->url("/leakedcheck"),
+//      "bigUrl"->url("/big"),
+//      "aliveUrl"->url("/alive"),
+//      "sysinfoUrl"->url("/sysinfo"),
+//      "configUrl"->url("/config"),
+//      "count"->count,
+//      "version"->MetaInfo.version
+//    )
+    layoutTemplate(
+      "/WEB-INF/templates/views/index.scaml",
       "engine"->request.engine,
       "checkUrl"->url("/check"),
       "factorsUrl"->url("/factors"),
@@ -124,8 +142,15 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
     val value = engine.check(num)
     val isPrime = value.map(_.isPrime).getOrElse(false)
     contentType="text/html"
-    scaml(
-      "check",
+//    scaml(
+//      "/templates/views/check",
+//      "num"->num,
+//      "value"->value,
+//      "againUrl"->gotoUrl(againUrl),
+//      "homeUrl"->homeUrl
+//      )
+    layoutTemplate(
+      "/WEB-INF/templates/views/check.scaml",
       "num"->num,
       "value"->value,
       "againUrl"->gotoUrl(againUrl),
