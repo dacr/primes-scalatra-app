@@ -15,6 +15,29 @@ class PrimesServlet extends PrimesscalatraappStack with ScalateSupport {
 
   override def isDevelopmentMode = false
   
+  
+  /* wire up the precompiled templates */
+  import org.fusesource.scalate.{ TemplateEngine, Binding }
+  import org.fusesource.scalate.layout.DefaultLayoutStrategy
+  override protected def defaultTemplatePath: List[String] = List("/WEB-INF/templates/views")
+  override protected def createTemplateEngine(config: ConfigT) = {
+    val engine = super.createTemplateEngine(config)
+    engine.layoutStrategy = new DefaultLayoutStrategy(engine,
+      TemplateEngine.templateTypes.map("/WEB-INF/templates/layouts/default." + _): _*)
+    engine.packagePrefix = "templates"
+    engine
+  }
+  /* end wiring up the precompiled templates */
+  
+  import javax.servlet.http.HttpServletRequest
+  import collection.mutable
+  override protected def templateAttributes(implicit request: HttpServletRequest): mutable.Map[String, Any] = {
+    super.templateAttributes ++ mutable.Map.empty // Add extra attributes here, they need bindings in the build file
+  }
+  
+  
+  
+  
   implicit class PrimesEngineRequest( request : ServletRequest ) {
     def engine : PrimesEngine = request.getServletContext().getAttribute( PrimesEngine.KEY ).asInstanceOf[PrimesEngine]
     def dbpool : Option[DataSource] = request.getServletContext().getAttribute( PrimesDBInit.KEY ).asInstanceOf[Option[DataSource]]

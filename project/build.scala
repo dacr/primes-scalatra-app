@@ -23,12 +23,7 @@ object PrimesscalatraappBuild extends Build {
   lazy val project = Project(
     "primes-scalatra-app",
     file("."),
-    settings = 
-      Defaults.defaultSettings ++ 
-      //ScalatraPlugin.scalatraWithJRebel ++
-      ScalatraPlugin.scalatraSettings ++
-      scalateSettings ++
-      Seq(
+    settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
@@ -48,30 +43,31 @@ object PrimesscalatraappBuild extends Build {
         "fr.janalyse" %% "primes" % PrimesVersion,
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
-        //"com.mchange" % "c3p0" % "0.9.5.1", // problem with java7 it uses new java8 jdbc API => java.lang.NoClassDefFoundError: java/sql/SQLType
+        // problem with java7 it uses new java8 jdbc API
+        // => java.lang.NoClassDefFoundError: java/sql/SQLType
+        // https://github.com/swaldman/c3p0/issues/57
+        //"com.mchange" % "c3p0" % "0.9.5.1",
         "com.mchange" % "c3p0" % "0.9.2.1",
         "net.sf.ehcache" % "ehcache-core" % "2.6.11",
         "javax.transaction" % "jta" % "1.1", // required for ehcache
         "mysql" % "mysql-connector-java" % "5.1.36",
         "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
-        "org.eclipse.jetty" % "jetty-webapp" % "8.1.16.v20140903" % "container",
-        "org.eclipse.jetty.orbit" % "javax.servlet.jsp" % "2.2.0.v201112011158" % "container;provided;test",
-        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar")))
-        /*.map(
-          _.exclude("org.scala-lang", "scala-compiler")
-            .exclude("org.scala-lang", "scala-reflect")
-            .exclude("com.typesafe.akka", "akka-actor_2.11")
-            .exclude("org.scala-lang", "jline")
-            )*/
-            ,
-      scalateTemplateConfig in Compile <<= (sourceDirectory in Compile) { base =>
+        "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
+        "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
+      ),
+      scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(
           TemplateConfig(
             base / "webapp" / "WEB-INF" / "templates",
-            Seq.empty, /* default imports should be added here */
+            //base / "templates",
+            Seq.empty,  /* default imports should be added here */
             Seq(
               Binding("context", "_root_.org.scalatra.scalate.ScalatraRenderContext", importMembers = true, isImplicit = true)
             ),  /* add extra bindings here */
-            Some("templates")))
-      }))
+            Some("templates")
+          )
+        )
+      }
+    ) // SEQ End
+  )
 }

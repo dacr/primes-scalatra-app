@@ -9,6 +9,9 @@ class ScalatraBootstrap extends LifeCycle with PrimesDBInit {
     logger.info("primesui is starting")
     dbSetup()
     
+    System.setProperty("scalate.allowReload",  "false")
+    System.setProperty("scalate.allowCaching", "true")
+    
     val pe = new PrimesEngine()
     pe.setup()
     

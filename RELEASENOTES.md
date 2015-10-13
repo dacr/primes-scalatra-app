@@ -9,6 +9,7 @@
  * scalatra scalate templates are now used
    - scaml base templates
    - isDevelopmentMode set to false
+   - templates are precompiled
  * twitter bootstrap is now used
  * more logging added to improve admin operations
 
