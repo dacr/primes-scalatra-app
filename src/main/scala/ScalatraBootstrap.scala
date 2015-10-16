@@ -11,7 +11,7 @@ class ScalatraBootstrap extends LifeCycle with PrimesDBInit {
     
     System.setProperty("scalate.mode",         "production")
     System.setProperty("scalate.allowReload",  "false")
-    System.setProperty("scalate.allowCaching", "true")
+    System.setProperty("scalate.allowCaching", "false")
     
     val pe = new PrimesEngine()
     pe.setup()
