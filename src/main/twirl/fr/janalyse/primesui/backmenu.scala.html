@@ -1,0 +1,9 @@
+@(mayAgainUrl:Option[String], homeUrl:String)
+
+<p>
+  @for(againUrl <- mayAgainUrl) {
+    <a href="@againUrl">Again</a> -
+  }
+  <a href="@homeUrl">Back to the menu</a>
+</p>
+

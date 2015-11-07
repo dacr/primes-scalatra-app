@@ -4,6 +4,7 @@ import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
 import com.mojolly.scalate.ScalatePlugin._
 import ScalateKeys._
+import play.twirl.sbt.SbtTwirl
 
 object PrimesscalatraappBuild extends Build {
 
@@ -69,5 +70,6 @@ object PrimesscalatraappBuild extends Build {
         )
       }
     ) // SEQ End
-  )
+  ).enablePlugins(SbtTwirl)
+  
 }

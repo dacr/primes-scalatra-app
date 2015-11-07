@@ -1,5 +1,10 @@
 
-# 0.1.19-SNAPSHOT
+# 0.1.19-SNAPSHOT after 2015-11-07
+
+ * moved from scalate to twirl because of performance issues within scalate linked with class loader
+
+
+# 0.1.19-SNAPSHOT before 2015-11-07
  
  * scalatra 2.4.0-RC3
  * c3p0 downgraded to 0.9.2.1 

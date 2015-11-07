@@ -1,0 +1,129 @@
+@import fr.janalyse.primes._
+@import fr.janalyse.primesui._
+
+@(engine:PrimesEngine, purls:PrimesUrls, count:Option[Long], version:String)
+
+@import purls._
+@import engine._
+
+@main(title="") {
+<h1>
+  <img src="images/logo.png"/>
+  <a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a>
+  is ready
+</h1>
+
+<p style="color:red">
+  <i>
+    Classic webapp / mysql release of primes ui web application, classical design,
+    almost all operations are synchronous.
+  </i>
+</p>
+}
+
+<p>
+  The database cache contains <b id="valuesCount">@valuesCount</b> already checked values, with
+  <b id="primesCount">@primesCount</b> primes found.
+  The highest found prime is <b id="lastPrime">@{ lastPrime.map(_.value).getOrElse(-1) }</b>
+  The application cache is <b id="cacheStatus">@{if (isUseCache) "enabled" else "disabled"}</b>.
+</p>
+
+<!-- ------------------------------------------------------------------------------------------- -->
+<h2>Features</h2>
+
+<ul>
+  <li>
+    <b><a href="@checkUrl">check/</a></b><code>$num</code>
+    : Test if <code>$num</code> is a prime number or not
+  </li>
+  <li>
+    <b><a href="@primeUrl">prime/</a></b><code>$nth</code>
+    : Get the <code>$nth</code> prime
+  </li>
+  <li>
+    <b><a href="@factorsUrl">factors/</a></b><code>$num</code>
+    : Get the prime factors of <code>$num</code>
+  </li>
+  <li>
+    <b><a href="@{primesUrl+"/1000"}">primes/</a></b><code>$below</code>
+    : List primes lower than <code>$below</code>.
+    List up to
+    @for(n <-List(1,25,50,100)) { <a href="@{primesUrl+"/"+(n*1000)}">@{n}K</a> }
+  </li>
+  <li>
+    <b><a href="@{primesUrl+"/140+/100"}">primes/</a></b><code>$below</code>/<code>above</code>
+    : List primes which are lower than <code>$below</code> and greater than <code>$above</code>
+  </li>
+  <li>
+    <b><a href="@{populateUrl+"/25000"}">populate/</a></b><code>$upto</code>
+    : Populate the database up to the specified value. It triggers a background thread.
+    @for(n <-List(1,25,50,100,250,500)) { <a href="@{populateUrl+"/"+(n*1000)}">@{n}K</a> }
+  </li>
+  <li>
+    <b><a href="@{ulamUrl+"/128"}">ulam/</a></b><code>$size</code>
+    : Dynamically draw an ulam spiral with the give <i>$size</i>.
+    Take care of your CPUs and Heap, this is a server side computation.
+    @for(n <-List(128,256,512,1024)) { <a href="@{ulamUrl+"/"+n}">@n</a> }
+  </li>
+ 
+</ul>
+<!-- ------------------------------------------------------------------------------------------- -->
+
+<h2>For experiments</h2>
+
+<ul>
+  <li>
+    <b><a href="@{slowcheckUrl}">slowcheck/</a></b><code>$num</code>/<code>$secs</code>
+    : to test if <code>$num</code> is a prime number or not,
+    and wait <code>$secs</code> seconds at server side, this is
+    for test purposes, default is 1 second.
+  </li>
+  <li>
+    <b><a href="@{slowsqlUrl}">slowsql/</a></b><code>$num</code>/<code>$secs</code>
+    : to test if <code>$num</code> is a prime number or not, and
+    wait <code>$secs</code> seconds inside the database, this is for
+    test purposes, default is 1 second, <b>cache feature is never used</b>.
+  </li>
+  <li>
+    <b><a href="@{leakedcheckUrl}">leakedcheck/</a></b><code>$num</code>/<code>$howmany</code>
+    : to test if <code>$num</code> is a prime number or not, and
+    leak <code>$howmany</code> megabytes at server side, this is for
+    test purposes, default is 1Mb.
+  </li>
+  <li>
+    <b><a href="@{bigUrl}">big/</a></b><code>$howmanyKB</code>
+    : to test a response with an approximative size
+    of <code>$howmany</code> kilobytes, default is 3Mb.
+  </li>
+</ul>
+
+<!-- ------------------------------------------------------------------------------------------- -->
+<h2>Admin</h2>
+
+<ul>
+  <li>
+    <b><a href="@aliveUrl">alive</a></b>
+    : Life page test
+  </li>
+  <li>
+    <b><a href="@sysinfoUrl">sysinfo</a></b>
+    : System information
+  </li>
+  <li>
+    <b><a href="@configUrl">config</a></b>
+    : Application configuration
+  </li>
+</ul>
+
+<!-- ------------------------------------------------------------------------------------------- -->
+
+<p align="right">
+  <a href="https://github.com/dacr/primes-scalatra-app">PrimesUI</a>
+  release <b><span id="primesui-version">@version</span></b>
+  based on <a href="https://github.com/dacr/primes">Primes library</a>
+  release <b><span id="primes-version">@primes.MetaInfo.version</span></b>
+  <br/>
+  @for(n <- count) {
+    <i>Current user homepage hit count <span id="userhitcount">@n</span></i>
+  }
+</p>
