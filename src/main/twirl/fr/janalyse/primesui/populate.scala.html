@@ -1,0 +1,12 @@
+@import fr.janalyse.primes._
+@import fr.janalyse.primesui._
+
+@(engine:PrimesEngine, purls:PrimesUrls, upto:Long, msgOpt:Option[String])
+
+@main(title="Populate") {
+  <h1>Primes generator state : @{engine.populate(upto)}</h1>
+  @for(msg <- msgOpt) {
+    <p>WARN : @msg</p>
+  }
+  @backmenu(None, purls.homeUrl)
+}

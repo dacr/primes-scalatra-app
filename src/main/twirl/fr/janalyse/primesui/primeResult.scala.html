@@ -1,0 +1,19 @@
+@import fr.janalyse.primes._
+@(nth:Long, value:Option[CheckedValue[Long]], againUrl:Option[String], homeUrl:String)
+@main(title="Check value") {
+<h1>
+  @value match {
+    case Some(CheckedValue(n, true, digits, nth)) => {
+      The @{nth}th prime is @n 
+    }
+    case Some(CheckedValue(n, false, digits, nth)) => {
+      The @{nth}th not prime is @n 
+    }
+    case None => {
+      not yet computed for @{nth}th
+    }
+  }
+</h1>
+
+@backmenu(againUrl, homeUrl)
+}

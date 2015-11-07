@@ -1,0 +1,26 @@
+@import fr.janalyse.primes._
+@import fr.janalyse.primesui._
+
+@(engine:PrimesEngine, purls:PrimesUrls)
+
+@import purls._
+@import engine._
+
+@main(title="Configuration") {
+  <h1>Configuration</h1>
+  <p>
+  <form method="POST" enctype="application/x-www-form-urlencoded; charset=utf-8" action="@configUrl">
+      @if(engine.isUseCache) {
+        <input type="checkbox" name="usecache" value="selected" checked="checked">
+      } else {
+        <input type="checkbox" name="usecache" value="selected">
+      }
+          Use application cache
+        </input>
+     <br/>
+     <input type="submit" value="Submit"/>
+  </form>
+  </p>
+  @backmenu(None, homeUrl)
+
+}

@@ -10,6 +10,7 @@ import org.squeryl.adapters.MySQLAdapter
 import javax.servlet.ServletRequest
 
 case class PrimesUrls(
+  homeUrl:String,
   checkUrl: String,
   factorsUrl: String,
   primeUrl: String,
@@ -42,6 +43,7 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   lazy val purls = PrimesUrls(
+    homeUrl = homeUrl,
     checkUrl=url("/check"),
     factorsUrl=url("/factors"),
     primeUrl=url("/prime"),
@@ -89,7 +91,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     val value = engine.check(num)
     contentType = "text/html"
-    html.showPrimeResult.render(num, value, gotoUrl(againUrl), homeUrl, None)
+    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl, None)
   }
 
   get("/check/:num") {
@@ -121,7 +123,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     Thread.sleep(secs * 1000L)
     val value = engine.check(num)
     contentType = "text/html"
-    html.showPrimeResult.render(num, value, gotoUrl(againUrl), homeUrl,
+    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl,
         Some(s"This page simulates a slow application server with a minimum response time of $secs second(s)."))
   }
 
@@ -143,7 +145,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
-    html.showPrimeResult.render(num, value, gotoUrl(againUrl), homeUrl,
+    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl,
         Some(s"This page simulates a slow database with a minimum response time of $secs second(s)."))
   }
 
@@ -167,7 +169,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     leak = (Array.fill[Byte](1024 * 1024 * howmany)(0x1)) :: leak
     val value = engine.check(num)
-    html.showPrimeResult.render(num, value, gotoUrl(againUrl), homeUrl,
+    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl,
         Some(s"this page simulates a memory leak, you've just lost $howmany megabytes"))
   }
 
@@ -188,13 +190,8 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   def prime(nth: Long, againUrl: Option[String]) = {
     val engine = request.engine
-    val checked = engine.getPrime(nth).get // TODO : DANGEROUS
-    <html>
-      <body>
-        <h1>{ checked.value } is the { checked.nth }th prime</h1>
-        <p>{ again(againUrl) } { gotoMenu }</p>
-      </body>
-    </html>
+    val checked = engine.getPrime(nth)
+    html.primeResult.render(nth, checked, gotoUrl(againUrl), homeUrl)
   }
 
   get("/prime/:nth") {
@@ -279,14 +276,7 @@ class PrimesServlet extends PrimesscalatraappStack {
         math.min(limit, uptoAsked) -> Some(s"$uptoAsked asked, authorized maximum is $limit !")
     val engine = request.engine
 
-    <html>
-      <body>
-        <h1>Primes generator state : { engine.populate(upto) }</h1>
-        { msg.map { m => <p>WARN : { m }</p> }.getOrElse(xml.NodeSeq.Empty) }
-        <p>{ gotoMenu }</p>
-      </body>
-    </html>
-
+    html.populate.render(request.engine, purls, upto, msg)
   }
 
   get("/ulam/:sz") {
@@ -298,28 +288,8 @@ class PrimesServlet extends PrimesscalatraappStack {
   }
 
   get("/config") {
-    forTestingOnly {
-      val engine = request.engine
-      <html>
-        <body>
-          <h1>Configuration</h1>
-          <form method="POST" enctype="application/x-www-form-urlencoded; charset=utf-8" action={ url("/config") }>
-            {
-              if (engine.isUseCache)
-                <input type="checkbox" name="usecache" value="selected" checked="checked">
-                  Use application cache
-                </input>
-              else
-                <input type="checkbox" name="usecache" value="selected">
-                  Use application cache
-                </input>
-
-            }<br/>
-            <input type="submit" value="Submit"/>
-          </form>
-          <p>{ gotoMenu }</p>
-        </body>
-      </html>
+    forTestingPurposesOnly {
+      html.config.render(request.engine, purls)
     }
   }
 
