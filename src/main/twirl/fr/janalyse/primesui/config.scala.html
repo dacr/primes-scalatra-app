@@ -1,12 +1,12 @@
 @import fr.janalyse.primes._
 @import fr.janalyse.primesui._
 
-@(engine:PrimesEngine, purls:PrimesUrls)
+@(ctx:PrimesUIContext, engine:PrimesEngine)
 
-@import purls._
+@import ctx._
 @import engine._
 
-@main(title="Configuration") {
+@main(ctx, title="Configuration") {
   <h1>Configuration</h1>
   <p>
   <form method="POST" enctype="application/x-www-form-urlencoded; charset=utf-8" action="@configUrl">

@@ -1,6 +1,7 @@
 @import fr.janalyse.primes._
-@(homeUrl:String)
-@main(title="Disabled Feature") {
+@import fr.janalyse.primesui._
+@(ctx:PrimesUIContext)
+@main(ctx, title="Disabled Feature") {
   <h1>Feature disabled...</h1>
-  @backmenu(None, homeUrl)
+  @backmenu(None, ctx.homeUrl)
 }

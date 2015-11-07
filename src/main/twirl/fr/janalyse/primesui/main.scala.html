@@ -1,16 +1,16 @@
-@(title: String)(content: Html)
+@import fr.janalyse.primesui._
+@(ctx:PrimesUIContext, title: String)(content: Html)
 <!DOCTYPE html>
 <html>
   <head>
     <title>@title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="@{ctx.homeUrl}/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="icon" type="image/png" href="@{ctx.homeUrl}/images/logo.png">
   </head>
   <body>
     <section class="content">@content</section>
-    <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="js/bootstrap.min.js"></script>
+    <script src="@{ctx.homeUrl}/js/jquery.min.js"></script>
+    <script src="@{ctx.homeUrl}/js/bootstrap.min.js"></script>
   </body>
 </html>
-

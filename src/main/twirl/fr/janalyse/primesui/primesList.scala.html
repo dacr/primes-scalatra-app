@@ -1,0 +1,12 @@
+@import fr.janalyse.primes._
+@import fr.janalyse.primesui._
+@(ctx:PrimesUIContext, below:Long, above:Long, primes:List[CheckedValue[Long]])
+@main(ctx, title="Primes list") {
+  <h1>Primes number above @above and below @below</h1>
+  <pre>
+@for(prime <- primes) {
+ @prime.nth --> @prime.value }
+  </pre>
+
+  @backmenu(None, ctx.homeUrl)
+}

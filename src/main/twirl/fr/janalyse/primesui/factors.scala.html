@@ -1,0 +1,19 @@
+@import fr.janalyse.primes._
+@import fr.janalyse.primesui._
+@(ctx:PrimesUIContext, num:Long, factors:Option[List[Long]], againUrl:Option[String])
+@main(ctx, title="Primes list") {
+
+@factors match {
+  case Some(Nil) => {
+    <h1>@num = @num <i>and is prime</i></h1>
+  }
+  case Some(fs) => {
+    <h1>@num = @{fs.mkString(" * ")}</h1>
+  }
+  case None => {
+    <h1>@num not computed yet</h1>
+  }
+}
+
+  @backmenu(againUrl, ctx.homeUrl)
+}

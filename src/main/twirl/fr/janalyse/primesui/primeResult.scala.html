@@ -1,6 +1,7 @@
 @import fr.janalyse.primes._
-@(nth:Long, value:Option[CheckedValue[Long]], againUrl:Option[String], homeUrl:String)
-@main(title="Check value") {
+@import fr.janalyse.primesui._
+@(ctx:PrimesUIContext, nth:Long, value:Option[CheckedValue[Long]], againUrl:Option[String])
+@main(ctx, title="Check value") {
 <h1>
   @value match {
     case Some(CheckedValue(n, true, digits, nth)) => {
@@ -15,5 +16,5 @@
   }
 </h1>
 
-@backmenu(againUrl, homeUrl)
+@backmenu(againUrl, ctx.homeUrl)
 }

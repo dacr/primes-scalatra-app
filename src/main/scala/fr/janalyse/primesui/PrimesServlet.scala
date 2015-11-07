@@ -9,7 +9,7 @@ import org.squeryl.Session
 import org.squeryl.adapters.MySQLAdapter
 import javax.servlet.ServletRequest
 
-case class PrimesUrls(
+case class PrimesUIContext(
   homeUrl:String,
   checkUrl: String,
   factorsUrl: String,
@@ -42,7 +42,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   }
 
-  lazy val purls = PrimesUrls(
+  lazy val ctx = PrimesUIContext(
     homeUrl = homeUrl,
     checkUrl=url("/check"),
     factorsUrl=url("/factors"),
@@ -69,7 +69,7 @@ class PrimesServlet extends PrimesscalatraappStack {
       Some(newcount)
     }
     contentType = "text/html"
-    html.index.render(request.engine, purls, count, MetaInfo.version)
+    html.index.render(ctx, request.engine, count, MetaInfo.version)
   }
 
   import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
@@ -83,15 +83,12 @@ class PrimesServlet extends PrimesscalatraappStack {
   def homeUrl(implicit request: HttpServletRequest, response: HttpServletResponse) = {
     url("/.", includeServletPath = false)
   }
-  def gotoMenu(implicit request: HttpServletRequest, response: HttpServletResponse) = {
-    <i><a href={ homeUrl }>Back to the menu</a></i>
-  }
 
   def check(num: Long, againUrl: Option[String]) = {
     val engine = request.engine
     val value = engine.check(num)
     contentType = "text/html"
-    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl, None)
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl), None)
   }
 
   get("/check/:num") {
@@ -104,18 +101,7 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   
   private def forTestingPurposesOnly(proc: => play.twirl.api.Html): play.twirl.api.Html = {
-    if (request.engine.useTesting) proc else html.disabledFeature.render(homeUrl)
-  }
-
-  private def forTestingOnly(proc: => xml.NodeSeq): xml.NodeSeq = {
-    if (request.engine.useTesting) proc else {
-      <html>
-        <body>
-          <h1>Feature disabled...</h1>
-          <p>{ gotoMenu }</p>
-        </body>
-      </html>
-    }
+    if (request.engine.useTesting) proc else html.disabledFeature.render(ctx)
   }
 
   def slowcheck(num: Long, secs: Long = 1L, againUrl: Option[String]=None) = forTestingPurposesOnly {
@@ -123,7 +109,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     Thread.sleep(secs * 1000L)
     val value = engine.check(num)
     contentType = "text/html"
-    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl,
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
         Some(s"This page simulates a slow application server with a minimum response time of $secs second(s)."))
   }
 
@@ -145,7 +131,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
-    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl,
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
         Some(s"This page simulates a slow database with a minimum response time of $secs second(s)."))
   }
 
@@ -169,7 +155,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     leak = (Array.fill[Byte](1024 * 1024 * howmany)(0x1)) :: leak
     val value = engine.check(num)
-    html.checkResult.render(num, value, gotoUrl(againUrl), homeUrl,
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
         Some(s"this page simulates a memory leak, you've just lost $howmany megabytes"))
   }
 
@@ -191,7 +177,7 @@ class PrimesServlet extends PrimesscalatraappStack {
   def prime(nth: Long, againUrl: Option[String]) = {
     val engine = request.engine
     val checked = engine.getPrime(nth)
-    html.primeResult.render(nth, checked, gotoUrl(againUrl), homeUrl)
+    html.primeResult.render(ctx, nth, checked, gotoUrl(againUrl))
   }
 
   get("/prime/:nth") {
@@ -206,19 +192,7 @@ class PrimesServlet extends PrimesscalatraappStack {
   def primes(below: Long, above: Long = 0L) = {
     val engine = request.engine
     val primes = engine.listPrimes(below, above)
-    <html>
-      <body>
-        <h1>Primes number above { above } and below { below }</h1>
-        <ul>
-          {
-            for { prime <- primes } yield {
-              <li><pre>{ prime.nth } --> { prime.value }</pre></li>
-            }
-          }
-        </ul>
-        <p>{ gotoMenu }</p>
-      </body>
-    </html>
+    html.primesList(ctx, below, above, primes)
   }
 
   get("/primes/:below/:above") {
@@ -235,35 +209,15 @@ class PrimesServlet extends PrimesscalatraappStack {
   get("/factors/:num") {
     val engine = request.engine
     val num = params("num").toLong
-    val factors = engine.factorize(num).get // TODO : DANGEROUS 
-    <html>
-      <body>
-        {
-          if (factors.isEmpty) <h1>{ num } = { num } <i>and is prime</i> </h1>
-          else <h1>{ num } = { factors.mkString(" * ") }</h1>
-        }
-        <p>{ gotoMenu }</p>
-      </body>
-    </html>
+    val factors = engine.factorize(num) 
+    html.factors.render(ctx, num, factors, None)
   }
 
   get("/factors") {
     val engine = request.engine
     val num = nextInt
-    val factors = engine.factorize(num).get // TODO : DANGEROUS 
-    <html>
-      <body>
-        {
-          if (factors.isEmpty) <h1>{ num } = { num } <i>and is prime</i> </h1>
-          else <h1>{ num } = { factors.mkString(" * ") }</h1>
-        }
-        <p>
-          <i><a href={ url("/factors") }>Again</a></i>
-          -
-          { gotoMenu }
-        </p>
-      </body>
-    </html>
+    val factors = engine.factorize(num) 
+    html.factors.render(ctx, num, factors, Some("/factors"))
   }
 
   get("/populate/:upto") {
@@ -276,7 +230,7 @@ class PrimesServlet extends PrimesscalatraappStack {
         math.min(limit, uptoAsked) -> Some(s"$uptoAsked asked, authorized maximum is $limit !")
     val engine = request.engine
 
-    html.populate.render(request.engine, purls, upto, msg)
+    html.populate.render(ctx, request.engine, upto, msg)
   }
 
   get("/ulam/:sz") {
@@ -289,12 +243,12 @@ class PrimesServlet extends PrimesscalatraappStack {
 
   get("/config") {
     forTestingPurposesOnly {
-      html.config.render(request.engine, purls)
+      html.config.render(ctx, request.engine)
     }
   }
 
   post("/config") {
-    forTestingOnly {
+    forTestingPurposesOnly {
       val engine = request.engine
       params.get("usecache") match {
         case None => engine.setUseCache(false)
@@ -304,18 +258,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     }
   }
 
-  def big(howmanyKB: Int = 3 * 1024) = forTestingOnly {
-    <html>
-      <body>
-        <h1>This is a big page, > 3Mb</h1>
-        {
-          for { _ <- 1 to 16 * howmanyKB } yield {
-            <p>1234567891234567891234567890123456789012345678901234567</p>
-          }
-        }
-        <p>{ gotoMenu }</p>
-      </body>
-    </html>
+  def big(howmanyKB: Int = 3 * 1024) = forTestingPurposesOnly {
+    html.big.render(ctx,howmanyKB)
   }
 
   get("/big/:howmany") {

@@ -1,12 +1,11 @@
 @import fr.janalyse.primes._
 @import fr.janalyse.primesui._
+@(ctx:PrimesUIContext, engine:PrimesEngine, count:Option[Long], version:String)
 
-@(engine:PrimesEngine, purls:PrimesUrls, count:Option[Long], version:String)
-
-@import purls._
+@import ctx._
 @import engine._
 
-@main(title="PrimesUI") {
+@main(ctx, title="PrimesUI") {
 <h1>
   <img src="images/logo.png"/>
   <a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a>
@@ -50,7 +49,7 @@
     @for(n <-List(1,25,50,100)) { <a href="@{primesUrl+"/"+(n*1000)}">@{n}K</a> }
   </li>
   <li>
-    <b><a href="@{primesUrl+"/140+/100"}">primes/</a></b><code>$below</code>/<code>above</code>
+    <b><a href="@{primesUrl+"/140/100"}">primes/</a></b><code>$below</code>/<code>above</code>
     : List primes which are lower than <code>$below</code> and greater than <code>$above</code>
   </li>
   <li>
