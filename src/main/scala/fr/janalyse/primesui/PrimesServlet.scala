@@ -217,7 +217,7 @@ class PrimesServlet extends PrimesscalatraappStack {
     val engine = request.engine
     val num = nextInt
     val factors = engine.factorize(num) 
-    html.factors.render(ctx, num, factors, Some("/factors"))
+    html.factors.render(ctx, num, factors, gotoUrl(Some("/factors")))
   }
 
   get("/populate/:upto") {
