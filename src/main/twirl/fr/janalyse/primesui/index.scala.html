@@ -71,10 +71,10 @@
 
 <ul>
   <li>
-    <b><a href="@{slowcheckUrl}">slowcheck/</a></b><code>$num</code>/<code>$secs</code>
+    <b><a href="@{slowcheckUrl}">slowcheck/</a></b><code>$num</code>/<code>$delay</code>
     : to test if <code>$num</code> is a prime number or not,
-    and wait <code>$secs</code> seconds at server side, this is
-    for test purposes, default is 1 second.
+    and wait <code>$delay</code> milliseconds at server side, this is
+    for test purposes, default is 1 second. Time units can be specified : <code>1m5s100ms</code>.
   </li>
   <li>
     <b><a href="@{slowsqlUrl}">slowsql/</a></b><code>$num</code>/<code>$secs</code>
@@ -85,8 +85,19 @@
   <li>
     <b><a href="@{leakedcheckUrl}">leakedcheck/</a></b><code>$num</code>/<code>$howmany</code>
     : to test if <code>$num</code> is a prime number or not, and
-    leak <code>$howmany</code> megabytes at server side, this is for
-    test purposes, default is 1Mb.
+    leak <code>$howmany</code> bytes at server side, this is for
+    test purposes, default is 1Mb. Size units can be specified : <code>1mb2kb3b</code>.
+  </li>
+  <li>
+    <b><a href="@{sessionleakedcheckUrl}">sessionleakedcheck/</a></b><code>$num</code>/<code>$howmany</code>
+    : to test if <code>$num</code> is a prime number or not, and
+    leak <code>$howmany</code> bytes inside current user session, this is for
+    test purposes, default is 1Mb. Size units can be specified : <code>1mb2kb3b</code>.
+  </li>
+  <li>
+    <b><a href="@{jdbcleakcheckUrl}">jdbcleakcheckUrl/</a></b><code>$num</code>
+    : to test if <code>$num</code> is a prime number or not, and
+    leak one jdbc connection.
   </li>
   <li>
     <b><a href="@{bigUrl}">big/</a></b><code>$howmanyKB</code>

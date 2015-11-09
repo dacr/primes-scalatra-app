@@ -3,6 +3,9 @@
 
  * moved from scalate to twirl because of performance issues within scalate linked with class loader
  * sysinfo reporting improvements and small refactoring
+ * new problem simulation urls :
+   - sessionleakedcheck : memory leak within the current user session
+   - jdbcleakcheck : to loose one jdbc connection
 
 # 0.1.19-SNAPSHOT before 2015-11-07
  

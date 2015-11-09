@@ -42,6 +42,7 @@ object PrimesscalatraappBuild extends Build {
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
         "fr.janalyse" %% "primes" % PrimesVersion,
+        "fr.janalyse" %% "unittools" % "0.2.7-SNAPSHOT",
         "fr.janalyse" %% "janalyse-jmx" % "0.7.1",
         "org.squeryl" %% "squeryl" % "0.9.5-7",
         // problem with java7 it uses new java8 jdbc API

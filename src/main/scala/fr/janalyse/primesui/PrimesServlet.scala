@@ -8,6 +8,7 @@ import org.squeryl.SessionFactory
 import org.squeryl.Session
 import org.squeryl.adapters.MySQLAdapter
 import javax.servlet.ServletRequest
+import fr.janalyse.unittools._
 
 case class PrimesUIContext(
   homeUrl: String,
@@ -20,6 +21,8 @@ case class PrimesUIContext(
   slowcheckUrl: String,
   slowsqlUrl: String,
   leakedcheckUrl: String,
+  sessionleakedcheckUrl:String,
+  jdbcleakcheckUrl:String,
   bigUrl: String,
   aliveUrl: String,
   sysinfoUrl: String,
@@ -49,6 +52,8 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     slowcheckUrl = url("/slowcheck"),
     slowsqlUrl = url("/slowsql"),
     leakedcheckUrl = url("/leakedcheck"),
+    sessionleakedcheckUrl = url("/sessionleakedcheck"),
+    jdbcleakcheckUrl = url("/jdbcleakcheck"),
     bigUrl = url("/big"),
     aliveUrl = url("/alive"),
     sysinfoUrl = url("/sysinfo"),
@@ -121,19 +126,19 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def slowcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def slowcheck(num: Long, delay: String = "1s", againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
-    Thread.sleep(secs * 1000L)
+    Thread.sleep(delay.toDuration())
     val value = engine.check(num)
     contentType = "text/html"
     html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"This page simulates a slow application server with a minimum response time of $secs second(s)."))
+      Some(s"This page simulates a slow application server with a minimum response time of $delay."))
   }
 
-  get("/slowcheck/:num/:secs") {
-    val secs = params.get("secs").map(_.toLong).getOrElse(1L)
+  get("/slowcheck/:num/:delay") {
+    val delay = params.get("delay").getOrElse("1s")
     val num = params("num").toLong
-    slowcheck(num, secs)
+    slowcheck(num, delay)
   }
   get("/slowcheck/:num") {
     val num = params("num").toLong
@@ -172,16 +177,16 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   var leak = List.empty[Array[Byte]]
 
-  def leakedcheck(num: Long, howmany: Int = 1, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def leakedcheck(num: Long, howmany: String = "1mb", againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
-    leak = (Array.fill[Byte](1024 * 1024 * howmany)(0x1)) :: leak
+    leak = (Array.fill[Byte](howmany.toSize().toInt)(0x1)) :: leak
     val value = engine.check(num)
     html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
       Some(s"this page simulates a memory leak, you've just lost $howmany megabytes"))
   }
 
   get("/leakedcheck/:num/:howmany") {
-    val howmany = params.get("howmany").map(_.toInt).getOrElse(1)
+    val howmany = params.get("howmany").getOrElse("1mb")
     val num = params("num").toLong
     leakedcheck(num, howmany)
   }
@@ -193,6 +198,56 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   get("/leakedcheck") {
     leakedcheck(nextInt, againUrl = Some("/leakedcheck"))
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  def sessionleakedcheck(num: Long, howmany: String = "1mb", againUrl: Option[String] = None) = forTestingPurposesOnly {
+    val engine = request.engine
+    val newleak = (Array.fill[Byte](howmany.toSize().toInt)(0x1))
+    val sessionleaks = Option(request.getSession.getAttribute("sessionmemleaks")).map(_.asInstanceOf[List[Array[Byte]]]) match {
+        case None        => List(newleak)
+        case Some(leaks) => newleak::leaks
+    }
+    request.getSession.setAttribute("sessionmemleaks", sessionleaks)
+    val value = engine.check(num)
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+      Some(s"this page simulates a session memory leak, you've just lost $howmany of heap memory in this current session."))
+  }
+
+  get("/sessionleakedcheck/:num/:howmany") {
+    val howmany = params.get("howmany").getOrElse("1mb")
+    val num = params("num").toLong
+    sessionleakedcheck(num, howmany)
+  }
+
+  get("/sessionleakedcheck/:num") {
+    val num = params("num").toLong
+    sessionleakedcheck(num)
+  }
+
+  get("/sessionleakedcheck") {
+    sessionleakedcheck(nextInt, againUrl = Some("/sessionleakedcheck"))
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  def jdbcleakcheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+    val engine = request.engine
+    val value = engine.check(num)
+    val dbpool = request.dbpool
+    dbpool.map(ds => ds.getConnection) // oups one connection lost
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+      Some(s"this page simulates a jdbc connection leak, you've just lost one !"))
+  }
+
+  get("/jdbcleakcheck/:num") {
+    val num = params("num").toLong
+    jdbcleakcheck(num)
+  }
+
+  get("/jdbcleakcheck") {
+    jdbcleakcheck(nextInt, againUrl = Some("/jdbcleakcheck"))
   }
 
   // ---------------------------------------------------------------------------------------------------------
