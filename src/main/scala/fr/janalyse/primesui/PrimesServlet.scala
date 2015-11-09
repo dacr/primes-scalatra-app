@@ -25,7 +25,7 @@ case class PrimesUIContext(
   sysinfoUrl: String,
   configUrl: String)
 
-class PrimesServlet extends PrimesscalatraappStack {
+class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   override def isDevelopmentMode = false
 
@@ -84,6 +84,12 @@ class PrimesServlet extends PrimesscalatraappStack {
     url("/.", includeServletPath = false)
   }
 
+  private def forTestingPurposesOnly(proc: => play.twirl.api.Html): play.twirl.api.Html = {
+    if (request.engine.useTesting) proc else html.disabledFeature.render(ctx)
+  }
+  
+  // ---------------------------------------------------------------------------------------------------------
+  
   def check(num: Long, againUrl: Option[String]) = {
     val engine = request.engine
     val value = engine.check(num)
@@ -99,10 +105,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     check(nextInt, Some("/check"))
   }
 
+  // ---------------------------------------------------------------------------------------------------------
   
-  private def forTestingPurposesOnly(proc: => play.twirl.api.Html): play.twirl.api.Html = {
-    if (request.engine.useTesting) proc else html.disabledFeature.render(ctx)
-  }
 
   def slowcheck(num: Long, secs: Long = 1L, againUrl: Option[String]=None) = forTestingPurposesOnly {
     val engine = request.engine
@@ -127,6 +131,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     slowcheck(nextInt, againUrl=Some("/slowcheck"))
   }
 
+  // ---------------------------------------------------------------------------------------------------------
+  
   def slowsql(num: Long, secs: Long = 1L, againUrl: Option[String]=None) = forTestingPurposesOnly {
     val engine = request.engine
     val dbpool = request.dbpool
@@ -148,6 +154,8 @@ class PrimesServlet extends PrimesscalatraappStack {
   get("/slowsql") {
     slowsql(nextInt, againUrl=Some("/slowsql"))
   }
+
+  // ---------------------------------------------------------------------------------------------------------
 
   var leak = List.empty[Array[Byte]]
 
@@ -174,6 +182,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     leakedcheck(nextInt, againUrl=Some("/leakedcheck"))
   }
 
+  // ---------------------------------------------------------------------------------------------------------
+
   def prime(nth: Long, againUrl: Option[String]) = {
     val engine = request.engine
     val checked = engine.getPrime(nth)
@@ -189,6 +199,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     prime(nextInt, Some("/prime"))
   }
 
+  // ---------------------------------------------------------------------------------------------------------
+  
   def primes(below: Long, above: Long = 0L) = {
     val engine = request.engine
     val primes = engine.listPrimes(below, above)
@@ -206,6 +218,8 @@ class PrimesServlet extends PrimesscalatraappStack {
     primes(below)
   }
 
+  // ---------------------------------------------------------------------------------------------------------
+
   get("/factors/:num") {
     val engine = request.engine
     val num = params("num").toLong
@@ -220,18 +234,23 @@ class PrimesServlet extends PrimesscalatraappStack {
     html.factors.render(ctx, num, factors, gotoUrl(Some("/factors")))
   }
 
+  // ---------------------------------------------------------------------------------------------------------
+
   get("/populate/:upto") {
     val uptoAsked = params("upto").toLong
     val limit = 2000000L
     val (upto, msg) =
-      if (request.engine.useTesting)
+      if (request.engine.useTesting) {
         uptoAsked -> None
-      else
+      } else {
         math.min(limit, uptoAsked) -> Some(s"$uptoAsked asked, authorized maximum is $limit !")
+      }
     val engine = request.engine
 
     html.populate.render(ctx, request.engine, upto, msg)
   }
+
+  // ---------------------------------------------------------------------------------------------------------
 
   get("/ulam/:sz") {
     val engine = request.engine
@@ -240,6 +259,23 @@ class PrimesServlet extends PrimesscalatraappStack {
     contentType = "image/png"
     response.getOutputStream().write(bytes)
   }
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  def big(howmanyKB: Int = 3 * 1024) = forTestingPurposesOnly {
+    html.big.render(ctx,howmanyKB)
+  }
+
+  get("/big/:howmany") {
+    val howmanyKB = params.get("howmany").map(_.toInt).getOrElse(3 * 1024)
+    big(howmanyKB)
+  }
+
+  get("/big") {
+    big()
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
 
   get("/config") {
     forTestingPurposesOnly {
@@ -258,51 +294,20 @@ class PrimesServlet extends PrimesscalatraappStack {
     }
   }
 
-  def big(howmanyKB: Int = 3 * 1024) = forTestingPurposesOnly {
-    html.big.render(ctx,howmanyKB)
-  }
-
-  get("/big/:howmany") {
-    val howmanyKB = params.get("howmany").map(_.toInt).getOrElse(3 * 1024)
-    big(howmanyKB)
-  }
-
-  get("/big") {
-    big()
-  }
+  // ---------------------------------------------------------------------------------------------------------
 
   get("/alive") {
     response.setContentType("text/plain")
     "OK"
   }
 
-  val selectedProps = {
-    import collection.JavaConversions._
-    val res = List(
-      "^os[.].*",
-      "^java[.]vm[.].*",
-      "^java[.]vendor[.].*",
-      "^java[.]runtime[.].*").map(_.r)
-    val props = System.getProperties.toMap
-    props.filter {
-      case (k, v) =>
-        res.exists(_.findFirstIn(k).isDefined)
-    }
-  }
+  // ---------------------------------------------------------------------------------------------------------
 
-  val extendedProps = {
-    import java.lang.management.ManagementFactory
-    val os = ManagementFactory.getOperatingSystemMXBean()
-    val rt = ManagementFactory.getRuntimeMXBean()
-    Map(
-      "extra.availableProcessors" -> java.lang.Runtime.getRuntime.availableProcessors.toString(),
-      "extra.sysinfo" -> "enabled")
-  }
 
   get("/sysinfo") {
     response.setContentType("text/plain")
     if (request.engine.useTesting) {
-      (selectedProps ++ extendedProps).toList.sorted.map { case (k, v) => k + "=" + v }.mkString("\n")
+      sysinfoProps.toList.sorted.map { case (k, v) => k + "=" + v }.mkString("\n")
     } else {
       "extra.sysinfo=disabled"
     }

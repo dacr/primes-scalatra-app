@@ -2,7 +2,7 @@
 # 0.1.19-SNAPSHOT after 2015-11-07
 
  * moved from scalate to twirl because of performance issues within scalate linked with class loader
-
+ * sysinfo reporting improvements and small refactoring
 
 # 0.1.19-SNAPSHOT before 2015-11-07
  
