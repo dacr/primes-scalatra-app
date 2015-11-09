@@ -37,11 +37,6 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   val rnd = scala.util.Random
   def nextInt = synchronized { rnd.nextInt(10000) }
 
-  before("*") {
-    response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
-
-  }
-
   lazy val ctx = PrimesUIContext(
     homeUrl = homeUrl,
     checkUrl=url("/check"),
@@ -59,18 +54,6 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     configUrl=url("/config")
   )
   
-  get("/") {
-    val count = if (!request.engine.useSession) None else {
-      val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
-        case None        => 1L
-        case Some(count) => count + 1
-      }
-      request.getSession.setAttribute("count", newcount)
-      Some(newcount)
-    }
-    contentType = "text/html"
-    html.index.render(ctx, request.engine, count, MetaInfo.version)
-  }
 
   import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
 
@@ -87,7 +70,29 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   private def forTestingPurposesOnly(proc: => play.twirl.api.Html): play.twirl.api.Html = {
     if (request.engine.useTesting) proc else html.disabledFeature.render(ctx)
   }
-  
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  before("*") {
+    response.setHeader("Cache-control", "no-cache, no-store, max-age=0, no-transform")
+
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  get("/") {
+    val count = if (!request.engine.useSession) None else {
+      val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
+        case None        => 1L
+        case Some(count) => count + 1
+      }
+      request.getSession.setAttribute("count", newcount)
+      Some(newcount)
+    }
+    contentType = "text/html"
+    html.index.render(ctx, request.engine, count, MetaInfo.version)
+  }
+
   // ---------------------------------------------------------------------------------------------------------
   
   def check(num: Long, againUrl: Option[String]) = {
@@ -220,18 +225,19 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  get("/factors/:num") {
+  def factors(num: Long, againUrl: Option[String]=None) = {
     val engine = request.engine
-    val num = params("num").toLong
     val factors = engine.factorize(num) 
-    html.factors.render(ctx, num, factors, None)
+    html.factors.render(ctx, num, factors, gotoUrl(againUrl))
+  }
+  
+  get("/factors/:num") {
+    val num = params("num").toLong
+    factors(num)
   }
 
   get("/factors") {
-    val engine = request.engine
-    val num = nextInt
-    val factors = engine.factorize(num) 
-    html.factors.render(ctx, num, factors, gotoUrl(Some("/factors")))
+    factors(nextInt, Some("/factors"))
   }
 
   // ---------------------------------------------------------------------------------------------------------
