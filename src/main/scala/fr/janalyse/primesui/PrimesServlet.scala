@@ -182,7 +182,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     leak = (Array.fill[Byte](howmany.toSize().toInt)(0x1)) :: leak
     val value = engine.check(num)
     html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page simulates a memory leak, you've just lost $howmany megabytes"))
+      Some(s"this page simulates a memory leak, you've just lost $howmany of heap memory."))
   }
 
   get("/leakedcheck/:num/:howmany") {
