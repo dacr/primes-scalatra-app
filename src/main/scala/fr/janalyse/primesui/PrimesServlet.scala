@@ -10,7 +10,7 @@ import org.squeryl.adapters.MySQLAdapter
 import javax.servlet.ServletRequest
 
 case class PrimesUIContext(
-  homeUrl:String,
+  homeUrl: String,
   checkUrl: String,
   factorsUrl: String,
   primeUrl: String,
@@ -26,6 +26,7 @@ case class PrimesUIContext(
   configUrl: String)
 
 class PrimesServlet extends PrimesscalatraappStack with SysInfo {
+  private val logger = org.slf4j.LoggerFactory.getLogger("fr.janalyse.primesui.PrimesServlet")
 
   override def isDevelopmentMode = false
 
@@ -39,21 +40,19 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   lazy val ctx = PrimesUIContext(
     homeUrl = homeUrl,
-    checkUrl=url("/check"),
-    factorsUrl=url("/factors"),
-    primeUrl=url("/prime"),
-    primesUrl=url("/primes"),
-    populateUrl=url("/populate"),
-    ulamUrl=url("/ulam"),
-    slowcheckUrl=url("/slowcheck"),
-    slowsqlUrl=url("/slowsql"),
-    leakedcheckUrl=url("/leakedcheck"),
-    bigUrl=url("/big"),
-    aliveUrl=url("/alive"),
-    sysinfoUrl=url("/sysinfo"),
-    configUrl=url("/config")
-  )
-  
+    checkUrl = url("/check"),
+    factorsUrl = url("/factors"),
+    primeUrl = url("/prime"),
+    primesUrl = url("/primes"),
+    populateUrl = url("/populate"),
+    ulamUrl = url("/ulam"),
+    slowcheckUrl = url("/slowcheck"),
+    slowsqlUrl = url("/slowsql"),
+    leakedcheckUrl = url("/leakedcheck"),
+    bigUrl = url("/big"),
+    aliveUrl = url("/alive"),
+    sysinfoUrl = url("/sysinfo"),
+    configUrl = url("/config"))
 
   import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
 
@@ -80,6 +79,16 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
+  error {
+    case e: Throwable => {
+      val rq = request.pathInfo
+      logger.error(s"Internal exception while processing $rq", e)
+      html.error.render(ctx)
+    }
+  }
+  
+  // ---------------------------------------------------------------------------------------------------------
+
   get("/") {
     val count = if (!request.engine.useSession) None else {
       val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
@@ -94,7 +103,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   // ---------------------------------------------------------------------------------------------------------
-  
+
   def check(num: Long, againUrl: Option[String]) = {
     val engine = request.engine
     val value = engine.check(num)
@@ -111,15 +120,14 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   // ---------------------------------------------------------------------------------------------------------
-  
 
-  def slowcheck(num: Long, secs: Long = 1L, againUrl: Option[String]=None) = forTestingPurposesOnly {
+  def slowcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     Thread.sleep(secs * 1000L)
     val value = engine.check(num)
     contentType = "text/html"
     html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-        Some(s"This page simulates a slow application server with a minimum response time of $secs second(s)."))
+      Some(s"This page simulates a slow application server with a minimum response time of $secs second(s)."))
   }
 
   get("/slowcheck/:num/:secs") {
@@ -133,17 +141,17 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   get("/slowcheck") {
-    slowcheck(nextInt, againUrl=Some("/slowcheck"))
+    slowcheck(nextInt, againUrl = Some("/slowcheck"))
   }
 
   // ---------------------------------------------------------------------------------------------------------
-  
-  def slowsql(num: Long, secs: Long = 1L, againUrl: Option[String]=None) = forTestingPurposesOnly {
+
+  def slowsql(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
     html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-        Some(s"This page simulates a slow database with a minimum response time of $secs second(s)."))
+      Some(s"This page simulates a slow database with a minimum response time of $secs second(s)."))
   }
 
   get("/slowsql/:num/:secs") {
@@ -157,19 +165,19 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   get("/slowsql") {
-    slowsql(nextInt, againUrl=Some("/slowsql"))
+    slowsql(nextInt, againUrl = Some("/slowsql"))
   }
 
   // ---------------------------------------------------------------------------------------------------------
 
   var leak = List.empty[Array[Byte]]
 
-  def leakedcheck(num: Long, howmany: Int = 1, againUrl: Option[String]=None) = forTestingPurposesOnly {
+  def leakedcheck(num: Long, howmany: Int = 1, againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     leak = (Array.fill[Byte](1024 * 1024 * howmany)(0x1)) :: leak
     val value = engine.check(num)
     html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-        Some(s"this page simulates a memory leak, you've just lost $howmany megabytes"))
+      Some(s"this page simulates a memory leak, you've just lost $howmany megabytes"))
   }
 
   get("/leakedcheck/:num/:howmany") {
@@ -184,7 +192,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   get("/leakedcheck") {
-    leakedcheck(nextInt, againUrl=Some("/leakedcheck"))
+    leakedcheck(nextInt, againUrl = Some("/leakedcheck"))
   }
 
   // ---------------------------------------------------------------------------------------------------------
@@ -205,7 +213,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   // ---------------------------------------------------------------------------------------------------------
-  
+
   def primes(below: Long, above: Long = 0L) = {
     val engine = request.engine
     val primes = engine.listPrimes(below, above)
@@ -225,12 +233,12 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def factors(num: Long, againUrl: Option[String]=None) = {
+  def factors(num: Long, againUrl: Option[String] = None) = {
     val engine = request.engine
-    val factors = engine.factorize(num) 
+    val factors = engine.factorize(num)
     html.factors.render(ctx, num, factors, gotoUrl(againUrl))
   }
-  
+
   get("/factors/:num") {
     val num = params("num").toLong
     factors(num)
@@ -269,7 +277,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def big(howmanyKB: Int = 3 * 1024) = forTestingPurposesOnly {
-    html.big.render(ctx,howmanyKB)
+    html.big.render(ctx, howmanyKB)
   }
 
   get("/big/:howmany") {
@@ -308,7 +316,6 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   // ---------------------------------------------------------------------------------------------------------
-
 
   get("/sysinfo") {
     response.setContentType("text/plain")
