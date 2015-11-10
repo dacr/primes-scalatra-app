@@ -22,7 +22,7 @@ object PrimesEngine {
   val KEY = "primes-engine"
 }
 
-class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
+class PrimesEngine extends PrimesDBApi with PrimesEngineMBean with SysInfo {
   private val logger = LoggerFactory.getLogger(getClass)
 
   private val oname = s"primes:name=PrimesEngine"
@@ -35,6 +35,7 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
     val mBeanServer = ManagementFactory.getPlatformMBeanServer();
     ManagementService.registerMBeans(manager, mBeanServer, true, true, true, true);
     logger.info("PrimesEngine started")
+    logger.info("SysInfo :\n"+sysinfoProps.toList.sorted.map{case (k,v)=> s"    $k=$v"}.mkString("\n"))
     this
   }
 
@@ -65,7 +66,11 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
   private var useCaches = provOrEnvOrDefault("PRIMESUI_CACHE", false)
 
   def isUseCache(): Boolean = useCaches
-  def setUseCache(v: Boolean) { useCaches = v }
+  def setUseCache(v: Boolean) {
+    if (v) logger.info("PrimesEngine is now using memory cache")
+    else logger.info("PrimesEngine is no longer using memory cache")
+    useCaches = v
+  }
 
   private lazy val cache = CacheManager.getInstance()
   private lazy val cachedValuesCache = cache.getCache("CachedValuesCache")
@@ -208,11 +213,15 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean {
 
   def ulamAsPNG(sz: Int): Array[Byte] = {
     usingcache({
+      logger.info(s"Generating ULAM image of size ${sz}x${sz}")
+      val started = System.currentTimeMillis()
       import javax.imageio.ImageIO
       import java.io._
       val bufferedImage = ulam(sz)
       val out = new ByteArrayOutputStream()
       ImageIO.write(bufferedImage, "PNG", out)
+      val d = System.currentTimeMillis() - started
+      logger.info(s"Image generated (in memory) in ${d}ms")
       out.toByteArray
     }, sz, ulamCache)
   }

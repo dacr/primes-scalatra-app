@@ -95,6 +95,13 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
 
   // ---------------------------------------------------------------------------------------------------------
+  // in comment because it takes precedents on default urls such as static resources...
+  //  notFound {
+  //    val rq = request.pathInfo
+  //    logger.error(s"Unsupported request '$rq', are you playing with me ?")
+  //    html.notFound.render(ctx)
+  //  }
+  // ---------------------------------------------------------------------------------------------------------
 
   def slowcheck(num: Long, delay: String = "1s", againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
@@ -115,7 +122,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     slowcheck(num)
   }
 
-  get("/slowcheck") {
+  get("/slowcheck/?") {
     slowcheck(nextInt, againUrl = Some("/slowcheck"))
   }
 
@@ -138,7 +145,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     highcpucheck(num)
   }
 
-  get("/highcpucheck") {
+  get("/highcpucheck/?") {
     highcpucheck(nextInt, againUrl = Some("/slowcheck"))
   }
   // ---------------------------------------------------------------------------------------------------------
@@ -161,7 +168,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     slowsql(num)
   }
 
-  get("/slowsql") {
+  get("/slowsql/?") {
     slowsql(nextInt, againUrl = Some("/slowsql"))
   }
 
@@ -188,7 +195,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     leakedcheck(num)
   }
 
-  get("/leakedcheck") {
+  get("/leakedcheck/?") {
     leakedcheck(nextInt, againUrl = Some("/leakedcheck"))
   }
 
@@ -218,7 +225,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     sessionleakedcheck(num)
   }
 
-  get("/sessionleakedcheck") {
+  get("/sessionleakedcheck/?") {
     sessionleakedcheck(nextInt, againUrl = Some("/sessionleakedcheck"))
   }
 
@@ -238,7 +245,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     jdbcleakcheck(num)
   }
 
-  get("/jdbcleakcheck") {
+  get("/jdbcleakcheck/?") {
     jdbcleakcheck(nextInt, againUrl = Some("/jdbcleakcheck"))
   }
 
@@ -255,7 +262,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     prime(nth, None)
   }
 
-  get("/prime") {
+  get("/prime/?") {
     prime(nextInt, Some("/prime"))
   }
 
@@ -315,7 +322,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     big(howmanyKB)
   }
 
-  get("/big") {
+  get("/big/?") {
     big()
   }
 
@@ -371,7 +378,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     factors(num)
   }
 
-  get("/factors") {
+  get("/factors/?") {
     factors(nextInt, Some("/factors"))
   }
 
@@ -389,7 +396,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     val num = params("num").toLong
     check(num, None)
   }
-  get("/check") {
+  get("/check/?") {
     check(nextInt, Some("/check"))
   }
 
