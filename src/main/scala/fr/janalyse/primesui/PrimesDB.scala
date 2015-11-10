@@ -122,43 +122,38 @@ trait PrimesDBInit {
   private val logger = org.slf4j.LoggerFactory.getLogger("fr.janalyse.primesui.PrimesDBInit")
 
   def env = System.getenv.toMap
-  def renvOrNone(re:String):Option[String] = {
-    env.toStream.collect {case (k,v) if re.r.findFirstIn(k).isDefined => v}.headOption
-  }
+  def renvOrNone(re:String):Option[String] = env.collect {case (k,v) if re.r.findFirstIn(k).isDefined => v}.headOption
+  def propOrEnvOrNone(key:String):Option[String] = propOrNone(key).orElse(envOrNone(key))
+
 
   private def internalClassicPoolBuild():ComboPooledDataSource = {
     val dbHost = None
-      .orElse(propOrNone("PRIMES_DB_HOST"))
-      .orElse(envOrNone("PRIMES_DB_HOST"))
-      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_HOST"))                 // OPENSHIFT
-      .orElse(propOrNone("RDS_HOSTNAME"))                           // AMAZON AWS
-      .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_ADDR""")) // DOCKER
+      .orElse(propOrEnvOrNone("PRIMES_DB_HOST"))
+      .orElse(propOrEnvOrNone("OPENSHIFT_MYSQL_DB_HOST"))             // OPENSHIFT
+      .orElse(propOrEnvOrNone("RDS_HOSTNAME"))                        // AMAZON AWS
+      .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_ADDR"""))   // DOCKER
       .getOrElse("localhost")
 
     val dbPort = None
-      .orElse(propOrNone("PRIMES_DB_PORT"))
-      .orElse(envOrNone("PRIMES_DB_PORT"))
-      .orElse(envOrNone("OPENSHIFT_MYSQL_DB_PORT"))                 // OPENSHIFT
-      .orElse(propOrNone("RDS_PORT"))                               // AMAZON AWS
-      .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_PORT""")) // DOCKER
+      .orElse(propOrEnvOrNone("PRIMES_DB_PORT"))
+      .orElse(propOrEnvOrNone("OPENSHIFT_MYSQL_DB_PORT"))             // OPENSHIFT
+      .orElse(propOrEnvOrNone("RDS_PORT"))                            // AMAZON AWS
+      .orElse(renvOrNone("""DOCKER_PRIMES_DB_PORT_\d+_TCP_PORT"""))   // DOCKER
       .getOrElse("3306").toInt
 
     val dbUsername = None
-      .orElse(envOrNone("PRIMES_DB_USERNAME"))
-      .orElse(propOrNone("PRIMES_DB_USERNAME"))
-      .orElse(propOrNone("RDS_USERNAME"))                           // AMAZON AWS
+      .orElse(propOrEnvOrNone("PRIMES_DB_USERNAME"))
+      .orElse(propOrEnvOrNone("RDS_USERNAME"))                        // AMAZON AWS
       .getOrElse("optimus")
 
     val dbPassword = None
-      .orElse(envOrNone("PRIMES_DB_PASSWORD"))
-      .orElse(propOrNone("PRIMES_DB_PASSWORD"))
-      .orElse(propOrNone("RDS_PASSWORD"))                           // AMAZON AWS
+      .orElse(propOrEnvOrNone("PRIMES_DB_PASSWORD"))
+      .orElse(propOrEnvOrNone("RDS_PASSWORD"))                        // AMAZON AWS
       .getOrElse("bumblebee")
 
     val dbName = None
-      .orElse(envOrNone("PRIMES_DB_NAME"))
-      .orElse(propOrNone("PRIMES_DB_NAME"))
-      .orElse(propOrNone("RDS_DB_NAME"))                            // AMAZON AWS
+      .orElse(propOrEnvOrNone("PRIMES_DB_NAME"))
+      .orElse(propOrEnvOrNone("RDS_DB_NAME"))                         // AMAZON AWS
       .getOrElse("primes")
 
     val dbUrl = s"jdbc:mysql://$dbHost:$dbPort/$dbName?user=$dbUsername&password=$dbPassword"
@@ -170,7 +165,7 @@ trait PrimesDBInit {
   
   private def internalViaUrlPoolBuild():Option[ComboPooledDataSource] = {
     for {
-      dbUrl <- propOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0)
+      dbUrl <- propOrEnvOrNone("JDBC_CONNECTION_STRING").filter(_.trim.size >0)
       } yield makeInternalDataSource(dbUrl)
   }
   
@@ -182,7 +177,7 @@ trait PrimesDBInit {
       val cpds = new ComboPooledDataSource(dsName)
       cpds.setDriverClass(driver)
       cpds.setJdbcUrl(url)
-      cpds.setMaxPoolSize(20)
+      cpds.setMaxPoolSize(100)
       cpds.setMinPoolSize(2)
       cpds.setInitialPoolSize(2)
       cpds.setMaxIdleTime(30)
