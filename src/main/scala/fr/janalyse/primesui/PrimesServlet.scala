@@ -96,38 +96,6 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  get("/") {
-    val count = if (!request.engine.useSession) None else {
-      val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
-        case None        => 1L
-        case Some(count) => count + 1
-      }
-      request.getSession.setAttribute("count", newcount)
-      Some(newcount)
-    }
-    contentType = "text/html"
-    html.index.render(ctx, request.engine, count, MetaInfo.version)
-  }
-
-  // ---------------------------------------------------------------------------------------------------------
-
-  def check(num: Long, againUrl: Option[String]) = {
-    val engine = request.engine
-    val value = engine.check(num)
-    contentType = "text/html"
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl), None)
-  }
-
-  get("/check/:num") {
-    val num = params("num").toLong
-    check(num, None)
-  }
-  get("/check") {
-    check(nextInt, Some("/check"))
-  }
-
-  // ---------------------------------------------------------------------------------------------------------
-
   def slowcheck(num: Long, delay: String = "1s", againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     Thread.sleep(delay.toDuration())
@@ -312,23 +280,6 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def factors(num: Long, againUrl: Option[String] = None) = {
-    val engine = request.engine
-    val factors = engine.factorize(num)
-    html.factors.render(ctx, num, factors, gotoUrl(againUrl))
-  }
-
-  get("/factors/:num") {
-    val num = params("num").toLong
-    factors(num)
-  }
-
-  get("/factors") {
-    factors(nextInt, Some("/factors"))
-  }
-
-  // ---------------------------------------------------------------------------------------------------------
-
   get("/populate/:upto") {
     val uptoAsked = params("upto").toLong
     val limit = 2000000L
@@ -405,4 +356,59 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     }
   }
 
+
+  // ---------------------------------------------------------------------------------------------------------
+  // REMEMBER : ROUTE MATCHING IS BOTTOM UP !!!! 
+
+  def factors(num: Long, againUrl: Option[String] = None) = {
+    val engine = request.engine
+    val factors = engine.factorize(num)
+    html.factors.render(ctx, num, factors, gotoUrl(againUrl))
+  }
+
+  get("/factors/:num") {
+    val num = params("num").toLong
+    factors(num)
+  }
+
+  get("/factors") {
+    factors(nextInt, Some("/factors"))
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+  // REMEMBER : ROUTE MATCHING IS BOTTOM UP !!!! 
+
+  def check(num: Long, againUrl: Option[String]) = {
+    val engine = request.engine
+    val value = engine.check(num)
+    contentType = "text/html"
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl), None)
+  }
+
+  get("/check/:num") {
+    val num = params("num").toLong
+    check(num, None)
+  }
+  get("/check") {
+    check(nextInt, Some("/check"))
+  }
+
+
+  // ---------------------------------------------------------------------------------------------------------
+  // REMEMBER : ROUTE MATCHING IS BOTTOM UP !!!! 
+
+  get("/") {
+    val count = if (!request.engine.useSession) None else {
+      val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
+        case None        => 1L
+        case Some(count) => count + 1
+      }
+      request.getSession.setAttribute("count", newcount)
+      Some(newcount)
+    }
+    contentType = "text/html"
+    html.index.render(ctx, request.engine, count, MetaInfo.version)
+  }
+  
+  
 }
