@@ -18,11 +18,12 @@ case class PrimesUIContext(
   primesUrl: String,
   populateUrl: String,
   ulamUrl: String,
+  highcpucheckUrl:String,
   slowcheckUrl: String,
   slowsqlUrl: String,
   leakedcheckUrl: String,
-  sessionleakedcheckUrl:String,
-  jdbcleakcheckUrl:String,
+  sessionleakedcheckUrl: String,
+  jdbcleakcheckUrl: String,
   bigUrl: String,
   aliveUrl: String,
   sysinfoUrl: String,
@@ -49,6 +50,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     primesUrl = url("/primes"),
     populateUrl = url("/populate"),
     ulamUrl = url("/ulam"),
+    highcpucheckUrl = url("/highcpucheck"),
     slowcheckUrl = url("/slowcheck"),
     slowsqlUrl = url("/slowsql"),
     leakedcheckUrl = url("/leakedcheck"),
@@ -91,7 +93,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
       html.error.render(ctx)
     }
   }
-  
+
   // ---------------------------------------------------------------------------------------------------------
 
   get("/") {
@@ -151,6 +153,28 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
+  def highcpucheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+    val engine = request.engine
+    val pgen = new fr.janalyse.primes.PrimesGenerator[Long]
+    val value = pgen.checkedValues.find(v => v.value == num)
+    contentType = "text/html"
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+      Some(
+        s"This page has a high CPU impact on the server, " +
+          "all values from 1 to $num are tested, because we " +
+          "need to give the prime or not prime rank of $num."))
+  }
+
+  get("/highcpucheck/:num") {
+    val num = params("num").toLong
+    highcpucheck(num)
+  }
+
+  get("/highcpucheck") {
+    highcpucheck(nextInt, againUrl = Some("/slowcheck"))
+  }
+  // ---------------------------------------------------------------------------------------------------------
+
   def slowsql(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     val dbpool = request.dbpool
@@ -206,8 +230,8 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     val engine = request.engine
     val newleak = (Array.fill[Byte](howmany.toSize().toInt)(0x1))
     val sessionleaks = Option(request.getSession.getAttribute("sessionmemleaks")).map(_.asInstanceOf[List[Array[Byte]]]) match {
-        case None        => List(newleak)
-        case Some(leaks) => newleak::leaks
+      case None        => List(newleak)
+      case Some(leaks) => newleak :: leaks
     }
     request.getSession.setAttribute("sessionmemleaks", sessionleaks)
     val value = engine.check(num)

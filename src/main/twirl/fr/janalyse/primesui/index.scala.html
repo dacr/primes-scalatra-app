@@ -71,6 +71,13 @@
 
 <ul>
   <li>
+    <b><a href="@{highcpucheckUrl}">highcpucheck/</a></b><code>$num</code>
+    : to test if <code>$num</code> is a prime number or not,
+    it is systematically computed, and as we want to get the rank, all values between
+    1 and  <code>$num</code> are tested ! So it has a high impact on CPU (only
+    one core is used). Here no memory or database cache is used.
+  </li>
+  <li>
     <b><a href="@{slowcheckUrl}">slowcheck/</a></b><code>$num</code>/<code>$delay</code>
     : to test if <code>$num</code> is a prime number or not,
     and wait <code>$delay</code> milliseconds at server side, this is
