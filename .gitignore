@@ -71,3 +71,5 @@ jrebel.lic
 
 .cache-main
 .cache-tests
+
+primesui*.log
