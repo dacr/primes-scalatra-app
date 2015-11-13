@@ -1,7 +1,6 @@
 package fr.janalyse.primesui
 
 import org.scalatra._
-import org.scalatra.scalate._
 import javax.sql.DataSource
 import javax.naming.InitialContext
 import org.squeryl.SessionFactory

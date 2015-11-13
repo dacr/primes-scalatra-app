@@ -34,13 +34,14 @@ trait SysInfo {
       }
     }
     val os = ManagementFactory.getOperatingSystemMXBean()
+    val osObjectName = new javax.management.ObjectName("java.lang:type=OperatingSystem")
     val rt = ManagementFactory.getRuntimeMXBean()
     Map(
       "extra.sysinfo" -> "enabled",
       "os.availableProcessors" -> java.lang.Runtime.getRuntime.availableProcessors.toString()) ++
-      get(os.getObjectName, "TotalPhysicalMemorySize", "os.totalMemory") ++
-      get(os.getObjectName, "TotalSwapSpaceSize", "os.totalSwap") ++
-      get(os.getObjectName, "MaxFileDescriptorCount", "user.maxFileDescriptorCount")
+      get(osObjectName, "TotalPhysicalMemorySize", "os.totalMemory") ++
+      get(osObjectName, "TotalSwapSpaceSize", "os.totalSwap") ++
+      get(osObjectName, "MaxFileDescriptorCount", "user.maxFileDescriptorCount")
   }
 
   private def fromExternalProcesses:Map[String,String] = {

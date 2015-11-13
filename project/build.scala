@@ -2,8 +2,6 @@ import sbt._
 import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
-import com.mojolly.scalate.ScalatePlugin._
-import ScalateKeys._
 import play.twirl.sbt.SbtTwirl
 
 object PrimesscalatraappBuild extends Build {
@@ -24,7 +22,7 @@ object PrimesscalatraappBuild extends Build {
   lazy val project = Project(
     "primes-scalatra-app",
     file("."),
-    settings = ScalatraPlugin.scalatraSettings ++ scalateSettings ++ Seq(
+    settings = ScalatraPlugin.scalatraSettings ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
@@ -38,7 +36,6 @@ object PrimesscalatraappBuild extends Build {
       resolvers += "JAnalyse Repository" at "http://www.janalyse.fr/repository/",
       libraryDependencies ++= Seq(
         "org.scalatra" %% "scalatra" % ScalatraVersion,
-        "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "org.scalatra" %% "scalatra-scalatest" % ScalatraVersion % "test",
         "fr.janalyse" %% "primes" % PrimesVersion,
@@ -56,20 +53,7 @@ object PrimesscalatraappBuild extends Build {
         "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
         "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
-      ),
-      scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
-        Seq(
-          TemplateConfig(
-            base / "webapp" / "WEB-INF" / "templates",
-            //base / "templates",
-            Seq.empty,  /* default imports should be added here */
-            Seq(
-              Binding("context", "_root_.org.scalatra.scalate.ScalatraRenderContext", importMembers = true, isImplicit = true)
-            ),  /* add extra bindings here */
-            Some("templates")
-          )
-        )
-      }
+      )
     ) // SEQ End
   ).enablePlugins(SbtTwirl)
   
