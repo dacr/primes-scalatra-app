@@ -6,10 +6,12 @@
 @import engine._
 
 @main(ctx, title="PrimesUI") {
+<div class="container">
+<div id="content">
+<div class="jumbotron">
 <h1>
   <img src="images/logo.png"/>
-  <a href="https://github.com/dacr/primes-scalatra-app">Primes web application</a>
-  is ready
+  <a href="https://github.com/dacr/primes-scalatra-app">Primes webapp</a>
 </h1>
 
 <p style="color:red">
@@ -22,12 +24,27 @@
 <p>
   The database cache contains <b id="valuesCount">@valuesCount</b> already checked values, with
   <b id="primesCount">@primesCount</b> primes found.
-  The highest found prime is <b id="lastPrime">@{ lastPrime.map(_.value).getOrElse(-1) }</b>
-  The application cache is <b id="cacheStatus">@{if (isUseCache) "enabled" else "disabled"}</b>.
+  The highest found prime is <b id="lastPrime">@{ lastPrime.map(_.value).getOrElse(-1) }</b>.
+  The application cache is
+    @if(isUseCache) {
+      <span class="label label-success" id="cacheStatus">Enabled</span>
+    } else {
+      <span class="label label-warning" id="cacheStatus">Disabled</span>
+    }
 </p>
+</div>
 
 <!-- ------------------------------------------------------------------------------------------- -->
-<h2>Features</h2>
+<ul class="nav nav-tabs">
+  <li class="active"><a data-toggle="tab" href="#features">Features</a></li>
+  <li ><a data-toggle="tab" href="#experiments">Experiments</a></li>
+  <li ><a data-toggle="tab" href="#admin">Admin</a></li>
+</ul>
+
+<div class="tab-content">
+
+<!-- ------------------------------------------------------------------------------------------- -->
+<div id="features" class="tab-pane fade in active">
 
 <ul>
   <li>
@@ -65,9 +82,9 @@
   </li>
  
 </ul>
+</div>
 <!-- ------------------------------------------------------------------------------------------- -->
-
-<h2>Experiments</h2>
+<div id="experiments" class="tab-pane fade">
 
 <ul>
   <li>
@@ -112,9 +129,9 @@
     of <code>$howmany</code> kilobytes, default is 3Mb.
   </li>
 </ul>
-
+</div>
 <!-- ------------------------------------------------------------------------------------------- -->
-<h2>Admin</h2>
+<div id="admin" class="tab-pane fade">
 
 <ul>
   <li>
@@ -130,7 +147,7 @@
     : Application configuration
   </li>
 </ul>
-
+</div>
 <!-- ------------------------------------------------------------------------------------------- -->
 
 <p align="right">
@@ -143,4 +160,8 @@
     <i>Current user homepage hit count <span id="userhitcount">@n</span></i>
   }
 </p>
+
+</div>
+</div>
+</div>
 }
