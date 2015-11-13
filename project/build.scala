@@ -3,6 +3,7 @@ import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
 import play.twirl.sbt.SbtTwirl
+//import com.earldouglas.xwp.JettyPlugin
 
 object PrimesscalatraappBuild extends Build {
 
@@ -16,8 +17,8 @@ object PrimesscalatraappBuild extends Build {
   val Version         = penvOrElse("PRIMESUI_REV", "0.1.26-SNAPSHOT")
   val PrimesVersion   = penvOrElse("PRIMES_REV",   "1.2.2-SNAPSHOT")
   val ScalaVersion    = "2.11.7"
-  //val ScalatraVersion = "2.3.1"
   val ScalatraVersion = "2.4.0.RC3"
+  //val ScalatraVersion = "2.4.0-SNAPSHOT"
 
   lazy val project = Project(
     "primes-scalatra-app",
@@ -53,8 +54,15 @@ object PrimesscalatraappBuild extends Build {
         "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
         "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
-      )
+      ).map(
+          _.exclude("org.scala-lang", "scala-compiler")
+            .exclude("org.scala-lang", "scala-reflect")
+            .exclude("com.typesafe.akka", "akka-actor_2.11")
+            .exclude("com.typesafe.akka", "akka-stream-experimental_2.11")
+            .exclude("org.scala-lang", "jline")
+            )
     ) // SEQ End
-  ).enablePlugins(SbtTwirl)
+  )//.enablePlugins(JettyPlugin)
+   .enablePlugins(SbtTwirl)
   
 }
