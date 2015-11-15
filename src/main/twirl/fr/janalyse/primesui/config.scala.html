@@ -9,16 +9,19 @@
 @main(ctx, title="Configuration") {
   <h1>Configuration</h1>
   <p>
-  <form method="POST" enctype="application/x-www-form-urlencoded; charset=utf-8" action="@configUrl">
+  <form role="form" method="POST" enctype="application/x-www-form-urlencoded; charset=utf-8" action="@configUrl">
+    <div class="checkbox">
+      <label>
       @if(engine.isUseCache) {
-        <input type="checkbox" name="usecache" value="selected" checked="checked">
+        <input type="checkbox" name="usecache" value="" checked="checked">
       } else {
-        <input type="checkbox" name="usecache" value="selected">
+        <input type="checkbox" name="usecache" value="">
       }
-          Use application cache
-        </input>
-     <br/>
-     <input type="submit" value="Submit"/>
+        Use application cache
+      </label>
+      <br/>
+      <input type="submit" value="Submit"/>
+    </div>
   </form>
   </p>
   @backmenu(None, homeUrl)
