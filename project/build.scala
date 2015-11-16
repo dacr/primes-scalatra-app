@@ -14,7 +14,7 @@ object PrimesscalatraappBuild extends Build {
 
   val Organization    = "fr.janalyse"
   val Name            = "primesui"
-  val Version         = penvOrElse("PRIMESUI_REV", "0.1.28-SNAPSHOT")
+  val Version         = penvOrElse("PRIMESUI_REV", "0.1.29-SNAPSHOT")
   val PrimesVersion   = penvOrElse("PRIMES_REV",   "1.2.2-SNAPSHOT")
   val ScalaVersion    = "2.11.7"
   val ScalatraVersion = "2.4.0.RC3"
