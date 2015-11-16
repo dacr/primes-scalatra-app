@@ -60,7 +60,9 @@ object PrimesscalatraappBuild extends Build {
             .exclude("com.typesafe.akka", "akka-actor_2.11")
             .exclude("com.typesafe.akka", "akka-stream-experimental_2.11")
             .exclude("org.scala-lang", "jline")
-            )
+            ),
+      publishArtifact in Test := false,
+      publishArtifact in (Compile, packageDoc) := false
     ) // SEQ End
   )//.enablePlugins(JettyPlugin)
    .enablePlugins(SbtTwirl)
