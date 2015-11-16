@@ -14,4 +14,10 @@
       <url-pattern>/js/*</url-pattern>
       <url-pattern>/assets/*</url-pattern>
     </servlet-mapping>
+
+    <session-config>
+      <!-- Disables URL-based sessions (no more 'jsessionid' in the URL using Tomcat) -->
+      <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
+
 </web-app>
