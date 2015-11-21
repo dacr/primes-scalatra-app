@@ -49,6 +49,9 @@ Just rename it to **primesui.war** and deploy it. For apache tomcat just drop th
    on the home page 'current user homepage hit count=x'
    If not set, the default is false.
 
+ * **PRIMESUI_DEBUG** environment variable or java system property can be used to enable
+   the DEBUG log level (if "true")
+
  * To specify a remote database using an externally defined data source :
    - Define a data source linked to "jdbc/primesui" jndi name.
    - any available external data source is used in priority over the default internal data source (C3P0 based) 

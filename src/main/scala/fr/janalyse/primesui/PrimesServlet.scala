@@ -19,14 +19,18 @@ case class PrimesUIContext(
   ulamUrl: String,
   highcpucheckUrl:String,
   slowcheckUrl: String,
-  slowsqlUrl: String,
+  slowsqlcheckUrl: String,
   leakedcheckUrl: String,
   sessionleakedcheckUrl: String,
   jdbcleakcheckUrl: String,
+  toomanylogscheckUrl:String,
+  badlogscheckUrl:String,
+  goodlogscheckUrl:String,
   bigUrl: String,
   aliveUrl: String,
   sysinfoUrl: String,
-  configUrl: String)
+  configUrl: String
+  )
 
 class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   private val logger = org.slf4j.LoggerFactory.getLogger("fr.janalyse.primesui.PrimesServlet")
@@ -51,14 +55,18 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     ulamUrl = url("/ulam"),
     highcpucheckUrl = url("/highcpucheck"),
     slowcheckUrl = url("/slowcheck"),
-    slowsqlUrl = url("/slowsql"),
+    slowsqlcheckUrl = url("/slowsqlcheck"),
     leakedcheckUrl = url("/leakedcheck"),
     sessionleakedcheckUrl = url("/sessionleakedcheck"),
     jdbcleakcheckUrl = url("/jdbcleakcheck"),
+    toomanylogscheckUrl = url("/toomanylogscheck"),
+    badlogscheckUrl = url("/badlogscheck"),
+    goodlogscheckUrl = url("/goodlogscheck"),
     bigUrl = url("/big"),
     aliveUrl = url("/alive"),
     sysinfoUrl = url("/sysinfo"),
-    configUrl = url("/config"))
+    configUrl = url("/config")
+    )
 
   import javax.servlet.http.{ HttpServletRequest, HttpServletResponse }
 
@@ -149,7 +157,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
   // ---------------------------------------------------------------------------------------------------------
 
-  def slowsql(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def slowsqlcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
@@ -157,18 +165,18 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
       Some(s"This page simulates a slow database with a minimum response time of $secs second(s)."))
   }
 
-  get("/slowsql/:num/:secs") {
+  get("/slowsqlcheck/:num/:secs") {
     val secs = params.get("secs").map(_.toLong).getOrElse(1L)
     val num = params("num").toLong
-    slowsql(num, secs)
+    slowsqlcheck(num, secs)
   }
-  get("/slowsql/:num") {
+  get("/slowsqlcheck/:num") {
     val num = params("num").toLong
-    slowsql(num)
+    slowsqlcheck(num)
   }
 
-  get("/slowsql/?") {
-    slowsql(nextInt, againUrl = Some("/slowsql"))
+  get("/slowsqlcheck/?") {
+    slowsqlcheck(nextInt, againUrl = Some("/slowsqlcheck"))
   }
 
   // ---------------------------------------------------------------------------------------------------------
@@ -246,6 +254,80 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   get("/jdbcleakcheck/?") {
     jdbcleakcheck(nextInt, againUrl = Some("/jdbcleakcheck"))
+  }
+  // ---------------------------------------------------------------------------------------------------------
+
+  def toomanylogscheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+    val started=System.currentTimeMillis()
+    logger.debug("Check started for "+num+" by "+request.getSession.getId)  // So ByValue - logback java7
+    logger.info("Check started for "+num)
+    val engine = request.engine
+    val value = engine.check(num)
+    val duration=(System.currentTimeMillis()-started)
+    logger.debug("Check finished for "+num+" in "+duration+" milliseconds"+" result is "+value.toString()+" by "+request.getSession.getId)
+    logger.info("Check finished for "+num)
+    logger.info("Checked "+value.toString()+" in "+duration+" milliseconds")
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+      Some(s"this page simulates a jdbc connection leak, you've just lost one !"))
+  }
+
+  get("/toomanylogscheck/:num") {
+    logger.info("Checking"+params("num"))
+    logger.debug("Checking "+params("num")+" by "+request.getSession.getId)
+    val num = params("num").toLong
+    logger.debug("Calling the check method with "+num+" value"+"by"+request.getSession.getId)
+    toomanylogscheck(num)
+  }
+
+  get("/toomanylogscheck/?") {
+    logger.info("Checking a random value")
+    logger.debug("Checking a random value by "+request.getSession.getId)
+    toomanylogscheck(nextInt, againUrl = Some("/toomanylogscheck"))
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  def badlogscheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+    val started=System.currentTimeMillis()
+    val engine = request.engine
+    val value = engine.check(num)
+    val duration=(System.currentTimeMillis()-started)
+    logger.debug("Checked "+value.toString()+" in "+duration+" milliseconds") // So ByValue - logback java7
+    logger.info("Checked "+value.toString()+" in "+duration+" milliseconds")  // So ByValue - logback java7
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+      Some(s"this page simulates a jdbc connection leak, you've just lost one !"))
+  }
+
+  get("/badlogscheck/:num") {
+    val num = params("num").toLong
+    badlogscheck(num)
+  }
+
+  get("/badlogscheck/?") {
+    badlogscheck(nextInt, againUrl = Some("/badlogscheck"))
+  }
+
+  // ---------------------------------------------------------------------------------------------------------
+
+  def goodlogscheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+    val started=System.currentTimeMillis()
+    val engine = request.engine
+    val value = engine.check(num)
+    val duration=(System.currentTimeMillis()-started)
+    lazy val message="Checked "+value.toString()+" in "+duration+" milliseconds"
+    if (logger.isDebugEnabled()) logger.debug(message) //  // So ByValue - logback java7
+    logger.info(message)  // So ByValue - logback java7
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+      Some(s"this page good logging !"))
+  }
+
+  get("/goodlogscheck/:num") {
+    val num = params("num").toLong
+    goodlogscheck(num)
+  }
+
+  get("/goodlogscheck/?") {
+    goodlogscheck(nextInt, againUrl = Some("/goodlogscheck"))
   }
 
   // ---------------------------------------------------------------------------------------------------------

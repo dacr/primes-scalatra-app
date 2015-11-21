@@ -51,7 +51,8 @@ object PrimesscalatraappBuild extends Build {
         "net.sf.ehcache" % "ehcache-core" % "2.6.11",
         "javax.transaction" % "jta" % "1.1", // required for ehcache
         "mysql" % "mysql-connector-java" % "5.1.36",
-        "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
+        "ch.qos.logback" % "logback-classic" % "1.1.3",
+        "org.codehaus.janino" % "janino" % "2.7.8", // Allow logback config file conditionals
         "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
         "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
       ).map(
