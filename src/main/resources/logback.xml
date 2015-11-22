@@ -1,6 +1,6 @@
 <configuration>
 
-	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
 		<file>logs/primesui.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -13,7 +13,7 @@
     </encoder>
 	</appender>
 
-
+  <!-- PRIMESUI_DEBUG system property or environment variable -->
   <if condition='property("PRIMESUI_DEBUG").contains("true")'>
     <then>
       <logger name="fr.janalyse.primesui" level="DEBUG"/>

@@ -183,7 +183,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   var leak = List.empty[Array[Byte]]
 
-  def leakedcheck(num: Long, howmany: String = "1mb", againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def leakedcheck(num: Long, howmany: String = "60Kb", againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     leak = (Array.fill[Byte](howmany.toSize().toInt)(0x1)) :: leak
     val value = engine.check(num)
@@ -208,7 +208,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def sessionleakedcheck(num: Long, howmany: String = "1mb", againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def sessionleakedcheck(num: Long, howmany: String = "320Kb", againUrl: Option[String] = None) = forTestingPurposesOnly {
     val engine = request.engine
     val newleak = (Array.fill[Byte](howmany.toSize().toInt)(0x1))
     val sessionleaks = Option(request.getSession.getAttribute("sessionmemleaks")).map(_.asInstanceOf[List[Array[Byte]]]) match {
