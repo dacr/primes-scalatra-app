@@ -17,6 +17,7 @@ case class PrimesUIContext(
   primesUrl: String,
   populateUrl: String,
   ulamUrl: String,
+  issuecheckUrl:String,
   highcpucheckUrl:String,
   slowcheckUrl: String,
   slowsqlcheckUrl: String,
@@ -53,6 +54,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     primesUrl = url("/primes"),
     populateUrl = url("/populate"),
     ulamUrl = url("/ulam"),
+    issuecheckUrl = url("/issuecheck"),
     highcpucheckUrl = url("/highcpucheck"),
     slowcheckUrl = url("/slowcheck"),
     slowsqlcheckUrl = url("/slowsqlcheck"),
@@ -110,7 +112,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   //  }
   // ---------------------------------------------------------------------------------------------------------
 
-  def slowcheck(num: Long, delay: String = "1s", againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def slowcheck(num: Long, delay: String = "1s", againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     Thread.sleep(delay.toDuration())
     val value = engine.check(num)
@@ -135,16 +137,19 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def highcpucheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def highcpucheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     val pgen = new fr.janalyse.primes.PrimesGenerator[Long]
     val value = pgen.checkedValues.find(v => v.value == num)
     contentType = "text/html"
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
+    val comment =
+      if (withComment)
       Some(
         s"This page has a high CPU impact on the server, " +
-          "all values from 1 to $num are tested, because we " +
-          "need to give the prime or not prime rank of $num."))
+          s"all values from 1 to $num are tested, because we " +
+          s"need to give the prime or not prime rank of $num.")
+      else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/highcpucheck/:num") {
@@ -157,12 +162,12 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
   // ---------------------------------------------------------------------------------------------------------
 
-  def slowsqlcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def slowsqlcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"This page simulates a slow database with a minimum response time of $secs second(s)."))
+    val comment = if (withComment) Some(s"This page simulates a slow database with a minimum response time of $secs second(s).")else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/slowsqlcheck/:num/:secs") {
@@ -183,12 +188,12 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   var leak = List.empty[Array[Byte]]
 
-  def leakedcheck(num: Long, howmany: String = "60Kb", againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def leakedcheck(num: Long, howmany: String = "60Kb", againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     leak = (Array.fill[Byte](howmany.toSize().toInt)(0x1)) :: leak
     val value = engine.check(num)
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page simulates a memory leak, you've just lost $howmany of heap memory."))
+    val comment = if (withComment) Some(s"this page simulates a memory leak, you've just lost $howmany of heap memory.") else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/leakedcheck/:num/:howmany") {
@@ -208,7 +213,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def sessionleakedcheck(num: Long, howmany: String = "320Kb", againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def sessionleakedcheck(num: Long, howmany: String = "320Kb", againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     val newleak = (Array.fill[Byte](howmany.toSize().toInt)(0x1))
     val sessionleaks = Option(request.getSession.getAttribute("sessionmemleaks")).map(_.asInstanceOf[List[Array[Byte]]]) match {
@@ -217,8 +222,8 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     }
     request.getSession.setAttribute("sessionmemleaks", sessionleaks)
     val value = engine.check(num)
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page simulates a session memory leak, you've just lost $howmany of heap memory in this current session."))
+    val comment = if (withComment) Some(s"this page simulates a session memory leak, you've just lost $howmany of heap memory in this current session.") else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/sessionleakedcheck/:num/:howmany") {
@@ -238,13 +243,13 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def jdbcleakcheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def jdbcleakcheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     val value = engine.check(num)
     val dbpool = request.dbpool
     dbpool.map(ds => ds.getConnection) // oups one connection lost
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page simulates a jdbc connection leak, you've just lost one !"))
+    val comment = if (withComment) Some(s"this page simulates a jdbc connection leak, you've just lost one !") else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/jdbcleakcheck/:num") {
@@ -257,7 +262,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
   // ---------------------------------------------------------------------------------------------------------
 
-  def toomanylogscheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def toomanylogscheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val started=System.currentTimeMillis()
     logger.debug("Check started for "+num+" by "+request.getSession.getId)  // So ByValue - logback java7
     logger.info("Check started for "+num)
@@ -267,8 +272,9 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     logger.debug("Check finished for "+num+" in "+duration+" milliseconds"+" result is "+value.toString()+" by "+request.getSession.getId)
     logger.info("Check finished for "+num)
     logger.info("Checked "+value.toString()+" in "+duration+" milliseconds")
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page simulates a jdbc connection leak, you've just lost one !"))
+    val comment = if (withComment) Some(s"this page generates too many logs") else None
+    logger.debug(s"page comment $comment")
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/toomanylogscheck/:num") {
@@ -287,15 +293,15 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def badlogscheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def badlogscheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val started=System.currentTimeMillis()
     val engine = request.engine
     val value = engine.check(num)
     val duration=(System.currentTimeMillis()-started)
     logger.debug("Checked "+value.toString()+" in "+duration+" milliseconds") // So ByValue - logback java7
     logger.info("Checked "+value.toString()+" in "+duration+" milliseconds")  // So ByValue - logback java7
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page simulates a jdbc connection leak, you've just lost one !"))
+    val comment = if (withComment) Some(s"this page is using poorly written logs") else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
   }
 
   get("/badlogscheck/:num") {
@@ -309,7 +315,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   // ---------------------------------------------------------------------------------------------------------
 
-  def goodlogscheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+  def goodlogscheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val started=System.currentTimeMillis()
     val engine = request.engine
     val value = engine.check(num)
@@ -317,8 +323,8 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     lazy val message="Checked "+value.toString()+" in "+duration+" milliseconds"
     if (logger.isDebugEnabled()) logger.debug(message) //  // So ByValue - logback java7
     logger.info(message)  // So ByValue - logback java7
-    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),
-      Some(s"this page good logging !"))
+    val comment = if (withComment) Some(s"Good logging !") else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl), comment)
   }
 
   get("/goodlogscheck/:num") {
@@ -330,6 +336,41 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     goodlogscheck(nextInt, againUrl = Some("/goodlogscheck"))
   }
 
+  // ---------------------------------------------------------------------------------------------------------
+
+  val issues = Map(
+    ("too much cpu", (n:Long, a: Option[String])=>highcpucheck(n,a,false)),
+    ("server too slow", (n:Long, a: Option[String])=>slowcheck(n,"1s", a,false)),
+    ("database too slow", (n:Long, a: Option[String])=>slowsqlcheck(n,2,a,false)),
+    ("heap memory leak", (n:Long, a: Option[String])=>leakedcheck(n,"60kb",a,false)),
+    ("session memory leak", (n:Long, a: Option[String])=>sessionleakedcheck(n,"500Kb",a,false)),
+    ("jdbc connection leak", (n:Long, a: Option[String])=>jdbcleakcheck(n,a,false)),
+    ("too many logs", (n:Long, a: Option[String])=>toomanylogscheck(n,a,false)),
+    ("bad logs", (n:Long, a: Option[String])=>badlogscheck(n,a,false))
+  )
+  
+  lazy val chosenIssue = {
+    logger.info(s"${issues.size} issues type are available")
+    val r = (math.random*8+1).toInt
+    val (label, issue) = issues.toList(r)
+    logger.info(s"Issue #$r has been chosen")
+    issue
+  }
+  
+  def issuecheck(num: Long, againUrl: Option[String] = None) = forTestingPurposesOnly {
+    chosenIssue(num, againUrl)
+  }
+
+  get("/issuecheck/:num") {
+    val num = params("num").toLong
+    issuecheck(num)
+  }
+
+  get("/issuecheck/?") {
+    issuecheck(nextInt, againUrl = Some("/issuecheck"))
+  }
+
+  
   // ---------------------------------------------------------------------------------------------------------
 
   def prime(nth: Long, againUrl: Option[String]) = {
