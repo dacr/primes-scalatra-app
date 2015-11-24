@@ -57,7 +57,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     ulamUrl = url("/ulam"),
     issuecheckUrl = url("/issuecheck"),
     highcpucheckUrl = url("/highcpucheck"),
-    overcheckUrl = url("overcheck"),
+    overcheckUrl = url("/overcheck"),
     slowcheckUrl = url("/slowcheck"),
     slowsqlcheckUrl = url("/slowsqlcheck"),
     leakedcheckUrl = url("/leakedcheck"),
