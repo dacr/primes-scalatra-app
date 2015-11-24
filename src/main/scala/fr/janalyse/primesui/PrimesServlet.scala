@@ -19,6 +19,7 @@ case class PrimesUIContext(
   ulamUrl: String,
   issuecheckUrl:String,
   highcpucheckUrl:String,
+  overcheckUrl:String,
   slowcheckUrl: String,
   slowsqlcheckUrl: String,
   leakedcheckUrl: String,
@@ -56,6 +57,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
     ulamUrl = url("/ulam"),
     issuecheckUrl = url("/issuecheck"),
     highcpucheckUrl = url("/highcpucheck"),
+    overcheckUrl = url("overcheck"),
     slowcheckUrl = url("/slowcheck"),
     slowsqlcheckUrl = url("/slowsqlcheck"),
     leakedcheckUrl = url("/leakedcheck"),
@@ -162,6 +164,31 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   }
   // ---------------------------------------------------------------------------------------------------------
 
+  def overcheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    val engine = request.engine
+    
+    val value = engine.listAll().find(_.value == num)
+    contentType = "text/html"
+    val comment =
+      if (withComment)
+      Some(
+        s"This page has a high heap impact on the server, " +
+          s"all checked values are loaded from the database")
+      else None
+    html.checkResult.render(ctx, num, value, gotoUrl(againUrl),comment)
+  }
+
+  get("/overcheck/:num") {
+    val num = params("num").toLong
+    overcheck(num)
+  }
+
+  get("/overcheck/?") {
+    overcheck(nextInt, againUrl = Some("/overcheck"))
+  }
+  // ---------------------------------------------------------------------------------------------------------
+
+  
   def slowsqlcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
     val engine = request.engine
     val dbpool = request.dbpool
@@ -340,6 +367,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   val issues = Map(
     ("too much cpu", (n:Long, a: Option[String])=>highcpucheck(n,a,false)),
+    ("too much heap", (n:Long, a: Option[String])=>overcheck(n,a,false)),
     ("server too slow", (n:Long, a: Option[String])=>slowcheck(n,"1s", a,false)),
     ("database too slow", (n:Long, a: Option[String])=>slowsqlcheck(n,2,a,false)),
     ("heap memory leak", (n:Long, a: Option[String])=>leakedcheck(n,"60kb",a,false)),

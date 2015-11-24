@@ -202,6 +202,10 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean with SysInfo {
     transaction { dbListPrimes(below, above).toList }.map(conv)
   }
 
+  def listAll() = {
+    transaction { dbListAll().toList}.map(conv)
+  }
+  
   private def ulam(sz: Int) = {
     val pgen = new PrimesGenerator[Long]
     transaction {

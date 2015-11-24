@@ -111,6 +111,15 @@ trait PrimesDBApi {
     qry.toIterator
   }
 
+  def dbListAll() = {
+    val qry = from(cachedValues)(cv =>
+        select (cv)
+        orderBy (cv.value asc)
+    )
+    qry.toIterator
+  }
+
+  
 }
 
 object PrimesDBInit {
