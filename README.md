@@ -4,19 +4,19 @@ Primesui is high performance web application which let you play with primes numb
 It can be deployed on any kind of application servers hosted on physical servers,
 on docker containers, on amazon web services, on openshift, ...
 
-With caching enabled you can reach thousands of simultaneous of users, and thousands 
+With caching enabled you can reach thousands of simultaneous users, and thousands 
 of requests served every seconds.
 [7000 users, 11000 hit/s example](http://www.janalyse.fr/gatling/loadtest-7000vus/) 
 with mysql, jetty, and gatling running on the same host (Linux gentoo, 6CPU, AMD II
 phenom X6 1090T).
 
-This demo application also comes with a set of special features for experiments purposes. Nine
-typical problems are simulated, from memory or jdbc connection leaks to poorly written
+This demo application also comes with a set of special features dedicated to experiments.
+Nine typical problems are simulated, from memory or jdbc connection leaks to poorly written
 logs. 
 
 You can directly play with this application on this server :
 [http://www.janalyse.org/primesui/](http://www.janalyse.org/primesui/),
-dangerous features (for the server) are disabled. 
+experiments features are disabled. 
 
 The latest `primesui.war` snapshot binary release (branch named `develop`) is available on
 [http://www.janalyse.fr/primesui/primesui.war](http://www.janalyse.fr/primesui/primesui.war).
@@ -24,8 +24,8 @@ Use this binary release, or build it by yourself as described in the next sectio
 
 You can easily run your own load tests on primesui using this
 [github project](https://github.com/dacr/primes-scalatra-app-loadtests). Just run `sbt test`
-from this project directory and your load tests will start. Just use some environment variables
-to customize your test as described in the project page. 
+from this project directory and your load tests will start. Several environment variables
+to configure or customize your test as described in the project page. 
 
 ## Build & Run locally ##
 
@@ -45,10 +45,10 @@ $ cd primes-scalatra-app
 $ ./sbt package
 ```
 It will generate a file such as : 
-*.../primes-scalatra-app/target/scala-2.11/primesui.war*
+*target/scala-2.11/primesui.war*
 
 For apache tomcat just drop this file to the following directory
-**.../apache-tomcat/webapps/** 
+**apache-tomcat/webapps/** 
 
 ## Requirements  ##
 
