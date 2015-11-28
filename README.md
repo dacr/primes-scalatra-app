@@ -1,7 +1,7 @@
 # primesui #
 
-Primesui is high performance web application which let you play with primes number.
-It can be deployed on any kind of application servers hosted on physical servers,
+Primesui is a high performance web application which let you play with primes number.
+It can be deployed on any kind of application servers hosted on physical or virtual servers,
 on docker containers, on amazon web services, on openshift, ...
 
 With caching enabled you can reach thousands of simultaneous users, and thousands 
@@ -13,6 +13,13 @@ phenom X6 1090T).
 This demo application also comes with a set of special features dedicated to experiments.
 Nine typical problems are simulated, from memory or jdbc connection leaks to poorly written
 logs. 
+
+This application relies on :
+* [scala](http://www.scala-lang.org/) : the jvm language used.
+* [scalatra](http://scalatra.org/) : the web framework.
+* [twirl](https://github.com/playframework/twirl) : the templating engine.
+* [squeryl](http://squeryl.org/) : the database layer
+* [ehcache](http://www.ehcache.org/) : the second level object cache.
 
 You can directly play with this application on this server :
 [http://www.janalyse.org/primesui/](http://www.janalyse.org/primesui/),
