@@ -1,4 +1,4 @@
-# primesui #
+# ![](http://www.janalyse.fr/primesui/logo.png) primesui #
 
 Primesui is a high performance web application which let you play with primes number.
 It can be deployed on any kind of application servers hosted on physical or virtual servers,
@@ -20,6 +20,7 @@ This application relies on :
 * [twirl](https://github.com/playframework/twirl) : the templating engine.
 * [squeryl](http://squeryl.org/) : the database layer
 * [ehcache](http://www.ehcache.org/) : the second level object cache.
+* [logback](http://logback.qos.ch/) : the logging system.
 
 You can directly play with this application on this server :
 [http://www.janalyse.org/primesui/](http://www.janalyse.org/primesui/),
