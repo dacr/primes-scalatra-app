@@ -10,17 +10,22 @@ of requests served every seconds.
 with mysql, jetty, and gatling running on the same host (Linux gentoo, 6CPU, AMD II
 phenom X6 1090T).
 
-This demo application also comes with special features for experiments purposes. Nine
+This demo application also comes with a set of special features for experiments purposes. Nine
 typical problems are simulated, from memory or jdbc connection leaks to poorly written
 logs. 
 
 You can directly play with this application on this server :
 [http://www.janalyse.org/primesui/](http://www.janalyse.org/primesui/),
-dangerous features (for the server) are disabled.
+dangerous features (for the server) are disabled. 
 
-The latest `primesui.war` snapshot binary release is available on
+The latest `primesui.war` snapshot binary release (branch named `develop`) is available on
 [http://www.janalyse.fr/primesui/primesui.war](http://www.janalyse.fr/primesui/primesui.war).
 Use this binary release, or build it by yourself as described in the next section.
+
+You can easily run your own load tests on primesui using this
+[github project](https://github.com/dacr/primes-scalatra-app-loadtests). Just run `sbt test`
+from this project directory and your load tests will start. Just use some environment variables
+to customize your test as described in the project page. 
 
 ## Build & Run locally ##
 
