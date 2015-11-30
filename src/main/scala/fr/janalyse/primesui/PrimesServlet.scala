@@ -554,7 +554,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
   // REMEMBER : ROUTE MATCHING IS BOTTOM UP !!!! 
 
-  get("/") {
+  get("/?") {
     val count = if (!request.engine.useSession) None else {
       val newcount = Option(request.getSession.getAttribute("count")).map(_.asInstanceOf[Long]) match {
         case None        => 1L
