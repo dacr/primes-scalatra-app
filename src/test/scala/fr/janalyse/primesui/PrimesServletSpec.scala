@@ -17,6 +17,15 @@ class PrimesServletSpec extends MutableScalatraSpec {
     handler
   }
   
+  // temporary hack to fill the database
+  "GET /populate/1000 on PrimesServlet" should {
+    "return status 200" in {
+      get("/") {
+	Thread.sleep(500)
+        status must_== 200
+      }
+    }
+  }
   
   "GET / on PrimesServlet" should {
     "return status 200" in {
