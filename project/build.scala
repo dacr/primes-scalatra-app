@@ -3,7 +3,7 @@ import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
 import play.twirl.sbt.SbtTwirl
-//import com.earldouglas.xwp.JettyPlugin
+import com.earldouglas.xwp.JettyPlugin
 
 object PrimesscalatraappBuild extends Build {
 
@@ -64,7 +64,7 @@ object PrimesscalatraappBuild extends Build {
       publishArtifact in Test := false,
       publishArtifact in (Compile, packageDoc) := false
     ) // SEQ End
-  )//.enablePlugins(JettyPlugin)
+  ).enablePlugins(JettyPlugin)
    .enablePlugins(SbtTwirl)
   
 }
