@@ -1,4 +1,6 @@
 
+# 0.1.36-SNAPSHOT 2016-03-05
+
 # 0.1.34-SNAPSHOT 2016-03-05
 
  * scalatra updated to 2.5.0 release
