@@ -2,6 +2,7 @@
 # 0.1.34-SNAPSHOT 2016-03-05
 
  * scalatra updated to 2.5.0 release
+ * scalatra-sbt updated to 0.5.1 release
 
 # 0.1.19-SNAPSHOT after 2015-11-07
 
