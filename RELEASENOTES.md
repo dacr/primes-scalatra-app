@@ -1,4 +1,8 @@
 
+# 0.1.34-SNAPSHOT 2016-03-05
+
+ * scalatra updated to 2.5.0 release
+
 # 0.1.19-SNAPSHOT after 2015-11-07
 
  * moved from scalate to twirl because of performance issues within scalate linked with class loader
