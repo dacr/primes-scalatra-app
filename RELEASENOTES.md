@@ -1,4 +1,13 @@
 
+# 0.1.36-SNAPSHOT 2016-03-05
+
+ * build date added
+
+# 0.1.34-SNAPSHOT 2016-03-05
+
+ * scalatra updated to 2.4.0 release
+ * scalatra-sbt updated to 0.5.1 release
+
 # 0.1.19-SNAPSHOT after 2015-11-07
 
  * moved from scalate to twirl because of performance issues within scalate linked with class loader

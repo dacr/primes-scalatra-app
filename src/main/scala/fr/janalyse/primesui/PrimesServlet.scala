@@ -115,6 +115,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def slowcheck(num: Long, delay: String = "1s", againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     Thread.sleep(delay.toDuration())
     val value = engine.check(num)
@@ -140,6 +141,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def highcpucheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     val pgen = new fr.janalyse.primes.PrimesGenerator[Long]
     val value = pgen.checkedValues.find(v => v.value == num)
@@ -165,6 +167,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def overcheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     
     val value = engine.listAll().find(_.value == num)
@@ -190,6 +193,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
 
   
   def slowsqlcheck(num: Long, secs: Long = 1L, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     val dbpool = request.dbpool
     val value = engine.slowsqlcheck(num, dbpool, secs)
@@ -216,6 +220,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   var leak = List.empty[Array[Byte]]
 
   def leakedcheck(num: Long, howmany: String = "60Kb", againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     leak = (Array.fill[Byte](howmany.toSize().toInt)(0x1)) :: leak
     val value = engine.check(num)
@@ -241,6 +246,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def sessionleakedcheck(num: Long, howmany: String = "320Kb", againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     val newleak = (Array.fill[Byte](howmany.toSize().toInt)(0x1))
     val sessionleaks = Option(request.getSession.getAttribute("sessionmemleaks")).map(_.asInstanceOf[List[Array[Byte]]]) match {
@@ -271,6 +277,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def jdbcleakcheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val engine = request.engine
     val value = engine.check(num)
     val dbpool = request.dbpool
@@ -290,6 +297,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def toomanylogscheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val started=System.currentTimeMillis()
     logger.debug("Check started for "+num+" by "+request.getSession.getId)  // So ByValue - logback java7
     logger.info("Check started for "+num)
@@ -321,6 +329,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def badlogscheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val started=System.currentTimeMillis()
     val engine = request.engine
     val value = engine.check(num)
@@ -343,6 +352,7 @@ class PrimesServlet extends PrimesscalatraappStack with SysInfo {
   // ---------------------------------------------------------------------------------------------------------
 
   def goodlogscheck(num: Long, againUrl: Option[String] = None, withComment:Boolean=true) = forTestingPurposesOnly {
+    logger.info("Checking#"+num)
     val started=System.currentTimeMillis()
     val engine = request.engine
     val value = engine.check(num)

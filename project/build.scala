@@ -3,7 +3,7 @@ import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
 import play.twirl.sbt.SbtTwirl
-//import com.earldouglas.xwp.JettyPlugin
+import com.earldouglas.xwp.JettyPlugin
 
 object PrimesscalatraappBuild extends Build {
 
@@ -14,11 +14,10 @@ object PrimesscalatraappBuild extends Build {
 
   val Organization    = "fr.janalyse"
   val Name            = "primesui"
-  val Version         = penvOrElse("PRIMESUI_REV", "0.1.33-SNAPSHOT")
+  val Version         = penvOrElse("PRIMESUI_REV", "0.1.36-SNAPSHOT")
   val PrimesVersion   = penvOrElse("PRIMES_REV",   "1.2.2-SNAPSHOT")
   val ScalaVersion    = "2.11.7"
-  val ScalatraVersion = "2.4.0.RC3"
-  //val ScalatraVersion = "2.4.0-SNAPSHOT"
+  val ScalatraVersion = "2.4.0"
 
   lazy val project = Project(
     "primes-scalatra-app",
@@ -66,7 +65,7 @@ object PrimesscalatraappBuild extends Build {
       publishArtifact in Test := false,
       publishArtifact in (Compile, packageDoc) := false
     ) // SEQ End
-  )//.enablePlugins(JettyPlugin)
+  ).enablePlugins(JettyPlugin)
    .enablePlugins(SbtTwirl)
   
 }

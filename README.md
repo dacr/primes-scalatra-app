@@ -40,7 +40,7 @@ to configure or customize your test as described in the project page.
 ```sh
 $ cd primes-scalatra-app
 $ ./sbt
-> container:start
+> jetty:start
 > browse
 ```
 

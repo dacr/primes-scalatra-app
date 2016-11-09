@@ -141,23 +141,23 @@ class PrimesEngine extends PrimesDBApi with PrimesEngineMBean with SysInfo {
     }
   }
 
-  def valuesCount(): Long = synchronized { // thundering effect counter measure
+  def valuesCount(): Long = { //synchronized { // thundering effect counter measure
     usingcache(transaction { dbValuesCount() }, "values", countersCache)
   }
 
-  def primesCount(): Long = synchronized { // thundering effect counter measure
+  def primesCount(): Long = { //synchronized { // thundering effect counter measure
     usingcache(transaction { dbPrimesCount() }, "primes", countersCache)
   }
 
-  def notPrimesCount(): Long = synchronized { // thundering effect counter measure
+  def notPrimesCount(): Long = { //synchronized { // thundering effect counter measure
     usingcache(transaction { dbNotPrimesCount() }, "notprimes", countersCache)
   }
 
-  def lastPrime(): Option[CheckedValue[Long]] = synchronized { // thundering effect counter measure
+  def lastPrime(): Option[CheckedValue[Long]] = { //synchronized { // thundering effect counter measure
     usingcache(transaction { dbLastPrime.map(conv) }, "lastprime", lastCache)
   }
 
-  def lastNotPrime(): Option[CheckedValue[Long]] = synchronized { // thundering effect counter measure
+  def lastNotPrime(): Option[CheckedValue[Long]] = { //synchronized { // thundering effect counter measure
     usingcache(transaction { dbLastNotPrime.map(conv) }, "lastnotprime", lastCache)
   }
 
