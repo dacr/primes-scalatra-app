@@ -193,18 +193,51 @@ trait PrimesDBInit {
       cpds
   }
 
-  private def externalPool(): Option[DataSource] = {
-    import javax.naming.{ InitialContext, Context }
+  import javax.naming.{ InitialContext, Context }
+  private def contextExplore(context:Context, path:String="", accu:List[String]=List.empty):List[String] = {
+    val result = for {binding <- context.listBindings("").toList} yield {
+      val name = binding.getName()
+      val newpath = s"$path/$name"
+      binding.getObject() match {
+        case b:Context =>
+          contextExplore(b, newpath, s"contextExplore : $newpath"::Nil)
+        case b =>
+          s"contextExplore : $newpath = $b"::Nil
+      }
+    }
+    accu:::result.flatten
+  }
+
+  
+  private def dslookup(context:Context,name:String):Option[DataSource] = {
     import scala.util.{ Try, Success }
-    val name = "java:/comp/env/jdbc/primesui"
-    val initContext = new InitialContext()
-    Try { initContext.lookup(name) } match {
+    logger.info(s"looking up for a jndi datasource named $name")
+    Try { context.lookup(name) } match {
       case Success(ds: DataSource) => 
         logger.info(s"Found an external datasource named '$name' ")
         Some(ds)
-      case _ => 
+      case _ =>
         None
     }
+  }
+  
+  private def externalPool(): Option[DataSource] = {
+    val context = new InitialContext()
+    logger.info(s"default JNDI context contains :\n"+contextExplore(context).mkString("\n"))
+    def candidates = Stream(
+          propOrEnvOrNone("PRIMES_DS_JNDI_NAME"),
+          Some("java:/comp/env/jdbc/primesui"),
+          Some("java:/comp/env/jdbc/primesds"),
+          Some("jdbc/primesui"),
+          Some("jdbc/primesds"),
+          Some("primesds")
+        )
+    val result = for {
+      candidate <- candidates
+      name <- candidate
+      ds <- dslookup(context,name)
+    } yield ds
+    result.headOption
   }
   
 
