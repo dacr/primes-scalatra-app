@@ -181,7 +181,7 @@ trait PrimesDBInit {
   private def makeInternalDataSource(url:String):ComboPooledDataSource = {
       val dsName = "primes-ds"
       val driver = "com.mysql.jdbc.Driver"
-      logger.info("Using built in internal datasource, C3P0 based")
+      logger.info(s"Using built in internal datasource, C3P0 based with url=$url")
       Class.forName(driver).newInstance()
       val cpds = new ComboPooledDataSource(dsName)
       cpds.setDriverClass(driver)
