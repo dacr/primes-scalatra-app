@@ -226,18 +226,24 @@ trait PrimesDBInit {
     logger.info(s"default JNDI context contains :\n"+contextExplore(context).mkString("\n"))
     def candidates = Stream(
           propOrEnvOrNone("PRIMES_DS_JNDI_NAME"),
+          Some("java:comp/env/jdbc/primesui"),
+          Some("java:comp/env/jdbc/primesds"),
           Some("java:/comp/env/jdbc/primesui"),
           Some("java:/comp/env/jdbc/primesds"),
           Some("jdbc/primesui"),
           Some("jdbc/primesds"),
+          Some("primesui"),
           Some("primesds")
         )
     val result = for {
-      candidate <- candidates
+      candidate <- candidates.toList
       name <- candidate
-      ds <- dslookup(context,name)
-    } yield ds
-    result.headOption
+    } yield {
+      val ds = dslookup(context,name)
+      logger.info(s"JNDI check : $candidate lookup result="+ds.isDefined)
+      ds
+    }
+    result.flatten.headOption
   }
   
 

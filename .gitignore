@@ -74,3 +74,4 @@ jrebel.lic
 
 primesui*.log
 hs_err*
+/bin/
