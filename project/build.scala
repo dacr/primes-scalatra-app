@@ -16,8 +16,8 @@ object PrimesscalatraappBuild extends Build {
   val Name            = "primesui"
   val Version         = penvOrElse("PRIMESUI_REV", "0.1.36-SNAPSHOT")
   val PrimesVersion   = penvOrElse("PRIMES_REV",   "1.2.2-SNAPSHOT")
-  val ScalaVersion    = "2.11.7"
-  val ScalatraVersion = "2.4.0"
+  val ScalaVersion    = "2.11.8"
+  val ScalatraVersion = "2.5.0"
 
   lazy val project = Project(
     "primes-scalatra-app",
